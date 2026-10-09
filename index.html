@@ -2,86 +2,234 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Menu Nintendo DS</title>
+    <title>Snake DS</title>
     <style>
-        /* Style ultra-basique compatible vieux navigateurs (Opera 8) */
         body {
-            background-color: #000080; /* Bleu rétro inspiré du menu DS */
-            color: #ffffff;
-            font-family: sans-serif;
-            font-size: 12px;
+            background-color: #000000;
+            color: #00ff00;
+            font-family: monospace;
+            font-size: 10px;
             margin: 0;
-            padding: 5px;
+            padding: 2px;
             text-align: center;
         }
 
         h1 {
-            font-size: 14px;
-            color: #ffff00;
-            margin: 5px 0;
+            font-size: 11px;
+            color: #00ff00;
+            margin: 2px 0;
         }
 
         .container {
-            width: 240px; /* Adapté à la largeur de l'écran de la DS */
+            width: 240px;
             margin: 0 auto;
         }
 
-        /* Boutons larges faciles à cliquer avec le stylet */
-        .ds-button {
-            display: block;
-            background-color: #c0c0c0;
-            color: #000000;
-            border: 2px solid #ffffff;
-            padding: 8px;
-            margin: 6px 0;
-            text-decoration: none;
-            font-weight: bold;
-            text-align: center;
+        /* Grille du Snake */
+        #grid {
+            border-collapse: collapse;
+            margin: 4px auto;
+            background-color: #111111;
+            border: 1px solid #00ff00;
         }
 
-        .ds-button:hover {
-            background-color: #ffffff;
-            color: #000080;
+        #grid td {
+            width: 9px;
+            height: 9px;
+            padding: 0;
+            margin: 0;
         }
 
-        .footer {
+        /* Éléments du jeu */
+        .snake {
+            background-color: #00ff00;
+        }
+
+        .food {
+            background-color: #ff0000;
+        }
+
+        .empty {
+            background-color: #111111;
+        }
+
+        .ds-btn {
+            background-color: #333333;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            font-family: monospace;
             font-size: 10px;
-            color: #c0c0c0;
-            margin-top: 10px;
+            padding: 3px 6px;
+            margin: 2px;
+            cursor: pointer;
+        }
+
+        .controls-table {
+            margin: 0 auto;
+        }
+
+        .controls-table td {
+            padding: 2px;
+            text-align: center;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>Mon Portail DS</h1>
-        <p>Bienvenue sur ta page web optimisee !</p>
+        <h1>SNAKE DS</h1>
+        <div>Score: <span id="score">0</span></div>
 
-        <!-- Liens sous forme de gros boutons tactiles -->
-        <a class="ds-button" href="http://www.google.com">Rechercher (Google)</a>
-        <a class="ds-button" href="#section2">Notes / Astuces</a>
-        <a class="ds-button" href="#contact">A propos</a>
+        <!-- Plateau de jeu généré par JS (environ 20x12) -->
+        <table id="grid"></table>
 
-        <div style="background-color: #000060; border: 1px solid #ffffff; padding: 5px; margin-top: 10px; text-align: left;">
-            <a name="section2"></a>
-            <strong>Infos :</strong><br>
-            Ce site utilise un design en HTML/CSS pur compatible avec le navigateur Opera de la DS.
-        </div>
-
-        <div class="footer">
-            &copy; 2026 - Retro Web DS
-        </div>
+        <!-- Boutons de contrôle tactiles (idéal pour le stylet de la DS) -->
+        <table class="controls-table">
+            <tr>
+                <td></td>
+                <td><button class="ds-btn" onclick="changerDirection('HAUT')">^</button></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td><button class="ds-btn" onclick="changerDirection('GAUCHE')">&lt;</button></td>
+                <td><button class="ds-btn" onclick="demarrerJeu()">START</button></td>
+                <td><button class="ds-btn" onclick="changerDirection('DROITE')">&gt;</button></td>
+            </tr>
+            <tr>
+                <td></td>
+                <td><button class="ds-btn" onclick="changerDirection('BAS')">v</button></td>
+                <td></td>
+            </tr>
+        </table>
     </div>
 
-    <!-- Script JS simple si besoin -->
     <script>
-        // Petit script de test compatible JS 1.5
-        function alerteDS() {
-            alert("La DS execute du JavaScript !");
+        var largeurGrille = 22;
+        var hauteurGrille = 11;
+        var snake = [];
+        var direction = 'DROITE';
+        var prochaineDirection = 'DROITE';
+        var nourriture = {x: 0, y: 0};
+        var score = 0;
+        var intervalJeu;
+        var enJeu = false;
+
+        // Création de la grille HTML au chargement
+        var grilleTable = document.getElementById("grid");
+        for (var y = 0; y < hauteurGrille; y++) {
+            var ligne = grilleTable.insertRow();
+            for (var x = 0; x < largeurGrille; x++) {
+                var cellule = ligne.insertCell();
+                cellule.id = "cell_" + x + "_" + y;
+                cellule.className = "empty";
+            }
+        }
+
+        function demarrerJeu() {
+            if (enJeu) return;
+            
+            // Initialisation du serpent au centre
+            snake = [
+                {x: 5, y: 5},
+                {x: 4, y: 5},
+                {x: 3, y: 5}
+            ];
+            direction = 'DROITE';
+            prochaineDirection = 'DROITE';
+            score = 0;
+            document.getElementById("score").innerHTML = score;
+            enJeu = true;
+
+            genererNourriture();
+            
+            if (intervalJeu) clearInterval(intervalJeu);
+            // Vitesse du serpent (en millisecondes par tick)
+            intervalJeu = setInterval(boucleJeu, 180);
+        }
+
+        function changerDirection(dir) {
+            if (dir === 'HAUT' && direction !== 'BAS') prochaineDirection = 'HAUT';
+            if (dir === 'BAS' && direction !== 'HAUT') prochaineDirection = 'BAS';
+            if (dir === 'GAUCHE' && direction !== 'DROITE') prochaineDirection = 'GAUCHE';
+            if (dir === 'DROITE' && direction !== 'GAUCHE') prochaineDirection = 'DROITE';
+        }
+
+        function genererNourriture() {
+            nourriture.x = Math.floor(Math.random() * largeurGrille);
+            nourriture.y = Math.floor(Math.random() * hauteurGrille);
+            
+            // Vérifier que la nourriture ne pop pas sur le serpent
+            for (var i = 0; i < snake.length; i++) {
+                if (snake[i].x === nourriture.x && snake[i].y === nourriture.y) {
+                    genererNourriture();
+                    break;
+                }
+            }
+        }
+
+        function boucleJeu() {
+            direction = prochaineDirection;
+            
+            // Calcul de la nouvelle tête
+            var tete = {x: snake[0].x, y: snake[0].y};
+            if (direction === 'HAUT') tete.y--;
+            if (direction === 'BAS') tete.y++;
+            if (direction === 'GAUCHE') tete.x--;
+            if (direction === 'DROITE') tete.x++;
+
+            // Collisions (murs ou soi-même)
+            if (tete.x < 0 || tete.x >= largeurGrille || tete.y < 0 || tete.y >= hauteurGrille) {
+                finDePartie();
+                return;
+            }
+            for (var i = 0; i < snake.length; i++) {
+                if (snake[i].x === tete.x && snake[i].y === tete.y) {
+                    finDePartie();
+                    return;
+                }
+            }
+
+            // Ajouter la nouvelle tête
+            snake.unshift(tete);
+
+            // Manger la nourriture ou avancer
+            if (tete.x === nourriture.x && tete.y === nourriture.y) {
+                score += 10;
+                document.getElementById("score").innerHTML = score;
+                genererNourriture();
+            } else {
+                // Retirer la queue
+                snake.pop();
+            }
+
+            mettreAJourAffichage();
+        }
+
+        function mettreAJourAffichage() {
+            // Effacer toute la grille
+            for (var y = 0; y < hauteurGrille; y++) {
+                for (var x = 0; x < largeurGrille; x++) {
+                    document.getElementById("cell_" + x + "_" + y).className = "empty";
+                }
+            }
+
+            // Afficher la nourriture (Rouge)
+            var cellNourriture = document.getElementById("cell_" + nourriture.x + "_" + nourriture.y);
+            if (cellNourriture) cellNourriture.className = "food";
+
+            // Afficher le serpent (Vert)
+            for (var i = 0; i < snake.length; i++) {
+                var cellSnake = document.getElementById("cell_" + snake[i].x + "_" + snake[i].y);
+                if (cellSnake) cellSnake.className = "snake";
+            }
+        }
+
+        function finDePartie() {
+            enJeu = false;
+            clearInterval(intervalJeu);
+            alert("Game Over ! Score : " + score);
         }
     </script>
-    <br>
-    <button onclick="alerteDS()" style="background:#c0c0c0; border:1px solid #000;">Test JS</button>
 
 </body>
 </html>
