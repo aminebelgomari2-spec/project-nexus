@@ -113,6 +113,21 @@
         .clicker-box:active {
             background-color: #663300;
         }
+
+        /* Style pour le Rickroll ASCII */
+        .rick-art {
+            background-color: #000000;
+            border: 1px dashed #ff00ff;
+            color: #ff66ff;
+            font-family: monospace;
+            font-size: 8px;
+            line-height: 8px;
+            white-space: pre;
+            text-align: center;
+            margin: 4px auto;
+            width: 230px;
+            padding: 4px;
+        }
     </style>
 </head>
 <body>
@@ -120,14 +135,15 @@
     <!-- ================= VUE 1 : MENU PRINCIPAL ================= -->
     <div id="vue-menu" class="vue actif">
         <h1>DS PORTAL MENU</h1>
-        <p style="font-size:9px; color:#ccc; margin:2px 0;">Choisis un jeu au stylet :</p>
+        <p style="font-size:9px; color:#ccc; margin:2px 0;">Choisis une option au stylet :</p>
         
         <a class="ds-menu-btn" href="javascript:changerVue('vue-snake'); demarrerSnake();">🐍 Snake Turbo</a>
         <a class="ds-menu-btn" href="javascript:changerVue('vue-morpion'); initialiserMorpion();">❌ Morpion (Tic-Tac-Toe)</a>
         <a class="ds-menu-btn" href="javascript:changerVue('vue-plusmoins'); initialiserPlusMoins();">🔢 Plus ou Moins</a>
-        <a class="ds-menu-btn" href="javascript:changerVue('vue-clicker'); initialiserClicker();">⛏️ Casseur de Blocs (Clicker)</a>
+        <a class="ds-menu-btn" href="javascript:changerVue('vue-clicker'); initialiserClicker();">⛏️ Casseur de Blocs</a>
+        <a class="ds-menu-btn" href="javascript:changerVue('vue-rick');" style="background:#400040; color:#ff99ff; border-color:#ff00ff;">🎵 Rickroll Secret</a>
         
-        <div style="margin-top: 8px; font-size: 9px; color: #888;">
+        <div style="margin-top: 6px; font-size: 9px; color: #888;">
             Navigateur DS - Opera Engine
         </div>
     </div>
@@ -226,6 +242,31 @@
 
         <div style="margin-top: 15px;">
             <a class="ds-btn" href="javascript:changerVue('vue-menu'); arreterClicker();" style="background:#550000; color:#ff9999;">RETOUR MENU</a>
+        </div>
+    </div>
+
+
+    <!-- ================= VUE 6 : RICKROLL ================= -->
+    <div id="vue-rick" class="vue">
+        <h1 style="color:#ff66ff;">RICKROLLED !</h1>
+        
+        <div class="rick-art">
+  o--o  o   o  o-O-o o-O-o  o--o  o     o
+  |   | |   |    |     |    |   | |     |
+  O--o  |   |    |     |    O--o  |     |
+  |   | |   |    |     |    |   | |     |
+  o--o   o-o     o     o    o--o   o-o-o 
+        </div>
+
+        <div style="font-size: 9px; color: #ffff00; margin: 4px;">
+            "Never gonna give you up..."
+        </div>
+        <div style="font-size: 8px; color: #ccc; margin-bottom: 8px;">
+            Tu t'es fait piéger sur Nintendo DS !
+        </div>
+
+        <div>
+            <a class="ds-btn" href="javascript:changerVue('vue-menu')" style="background:#550000; color:#ff9999;">RETOUR MENU</a>
         </div>
     </div>
 
