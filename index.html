@@ -2,164 +2,213 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Snake DS Ultra</title>
+    <title>DS Home Menu</title>
     <style>
         body {
-            background-color: #000000;
-            color: #00ff00;
+            background-color: #000040; /* Bleu menu DS classique */
+            color: #ffffff;
             font-family: monospace;
             font-size: 11px;
             margin: 0;
-            padding: 2px;
+            padding: 4px;
             text-align: center;
         }
-        h1 { font-size: 12px; margin: 2px 0; color: #00ff00; }
+        h1 { font-size: 13px; color: #ffff00; margin: 4px 0; }
+        
+        /* Les différents écrans (Menu ou Jeux) */
+        .vue { display: none; }
+        .vue.actif { display: block; }
+
+        /* Style des boutons du menu */
+        .ds-menu-btn {
+            display: block;
+            background-color: #c0c0c0;
+            color: #000000;
+            border: 2px solid #ffffff;
+            padding: 8px;
+            margin: 8px auto;
+            width: 200px;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 11px;
+        }
+        .ds-menu-btn:active {
+            background-color: #ffffff;
+        }
+
+        /* Style pour Snake */
         #ecranJeu {
             background-color: #111111;
             border: 1px solid #00ff00;
             width: 230px;
-            height: 90px;
-            margin: 4px auto;
+            height: 85px;
+            margin: 2px auto;
             font-family: monospace;
             font-size: 9px;
             line-height: 8px;
             text-align: left;
             overflow: hidden;
             white-space: pre;
+            color: #00ff00;
         }
-        /* Style des boutons faits avec des liens (ultra-compatible DS) */
         .ds-btn {
             display: inline-block;
             background-color: #222222;
             color: #00ff00;
             border: 1px solid #00ff00;
-            padding: 4px 8px;
+            padding: 3px 6px;
             font-size: 10px;
             font-weight: bold;
             text-decoration: none;
-            margin: 2px;
-        }
-        .ds-btn:active {
-            background-color: #00ff00;
-            color: #000000;
+            margin: 1px;
         }
     </style>
 </head>
 <body>
 
-    <h1>SNAKE DS</h1>
-    <div>Score: <span id="score">0</span></div>
-
-    <div id="ecranJeu">Appuie sur START !</div>
-
-    <!-- Utilisation de liens <a> au lieu de <button> pour forcer la compatibilité tactile de la DS -->
-    <div>
-        <a class="ds-btn" href="javascript:dir('HAUT');">^ HAUT</a><br>
-        <a class="ds-btn" href="javascript:dir('GAUCHE');">&lt; GAUCHE</a>
-        <a class="ds-btn" href="javascript:dir('DROITE');">DROITE &gt;</a><br>
-        <a class="ds-btn" href="javascript:dir('BAS');">v BAS</a>
+    <!-- ================= VUE 1 : MENU PRINCIPAL ================= -->
+    <div id="vue-menu" class="vue actif">
+        <h1>DS PORTAL MENU</h1>
+        <p style="font-size:10px; color:#ccc;">Choisis un jeu au stylet :</p>
+        
+        <a class="ds-menu-btn" href="javascript:changerVue('vue-snake'); demarrerSnake();">🐍 Snake Turbo</a>
+        <a class="ds-menu-btn" href="javascript:changerVue('vue-morpion');">❌ Morpion (Bientôt)</a>
+        
+        <div style="margin-top: 15px; font-size: 9px; color: #888;">
+            Navigateur DS - Opera Engine
+        </div>
     </div>
-    <div style="margin-top:4px;">
-        <a class="ds-btn" href="javascript:demarrer();" style="background:#003300; color:#ffff00;">START</a>
+
+
+    <!-- ================= VUE 2 : SNAKE ================= -->
+    <div id="vue-snake" class="vue">
+        <h1>SNAKE DS</h1>
+        <div>Score: <span id="score">0</span></div>
+
+        <div id="ecranJeu">Chargement...</div>
+
+        <div>
+            <a class="ds-btn" href="javascript:dir('HAUT')">^ HAUT</a><br>
+            <a class="ds-btn" href="javascript:dir('GAUCHE')">&lt;</a>
+            <a class="ds-btn" href="javascript:dir('DROITE')">&gt;</a><br>
+            <a class="ds-btn" href="javascript:dir('BAS')">v BAS</a>
+        </div>
+        
+        <div style="margin-top: 4px;">
+            <a class="ds-btn" href="javascript:changerVue('vue-menu'); arreterSnake();" style="background:#550000; color:#ff9999;">RETOUR MENU</a>
+        </div>
     </div>
+
+
+    <!-- ================= VUE 3 : MORPION (PRÉPARATION) ================= -->
+    <div id="vue-morpion" class="vue">
+        <h1>MORPION DS</h1>
+        <p>Ce jeu arrive bientôt !</p>
+        <br><br>
+        <a class="ds-btn" href="javascript:changerVue('vue-menu');">RETOUR MENU</a>
+    </div>
+
 
 <script>
-var l = 38;
-var h = 11;
-var snake = [];
-var dirActuelle = 'DROITE';
-var prompDir = 'DROITE';
-var nourX = 5, nourY = 5;
-var score = 0;
-var timer = null;
-var enJeu = false;
-
-function demarrer() {
-    if(enJeu) return;
-    snake = [{x:10, y:5}, {x:9, y:5}, {x:8, y:5}];
-    dirActuelle = 'DROITE';
-    prompDir = 'DROITE';
-    score = 0;
-    document.getElementById('score').innerHTML = score;
-    enJeu = true;
-    genererNourriture();
-    if(timer) clearInterval(timer);
-    timer = setInterval(boucle, 300); // 300ms pour laisser largement le temps à la DS
-}
-
-function dir(d) {
-    if(d === 'HAUT' && dirActuelle !== 'BAS') prompDir = 'HAUT';
-    if(d === 'BAS' && dirActuelle !== 'HAUT') prompDir = 'BAS';
-    if(d === 'GAUCHE' && dirActuelle !== 'DROITE') prompDir = 'GAUCHE';
-    if(d === 'DROITE' && dirActuelle !== 'GAUCHE') prompDir = 'DROITE';
-    
-    // Si le jeu n'a pas commencé, le bouton START lance aussi le jeu
-    if(!enJeu) demarrer();
-}
-
-function genererNourriture() {
-    nourX = Math.floor(Math.random() * (l - 2)) + 1;
-    nourY = Math.floor(Math.random() * (h - 2)) + 1;
-}
-
-function boucle() {
-    dirActuelle = prompDir;
-    var tete = {x: snake[0].x, y: snake[0].y};
-    
-    if(dirActuelle === 'HAUT') tete.y--;
-    if(dirActuelle === 'BAS') tete.y++;
-    if(dirActuelle === 'GAUCHE') tete.x--;
-    if(dirActuelle === 'DROITE') tete.x++;
-
-    if(tete.x <= 0 || tete.x >= l-1 || tete.y <= 0 || tete.y >= h-1) {
-        fin(); return;
-    }
-    for(var i=0; i<snake.length; i++) {
-        if(snake[i].x === tete.x && snake[i].y === tete.y) { fin(); return; }
-    }
-
-    snake.unshift(tete);
-    if(tete.x === nourX && tete.y === nourY) {
-        score += 10;
-        document.getElementById('score').innerHTML = score;
-        genererNourriture();
-    } else {
-        snake.pop();
-    }
-
-    redessiner();
-}
-
-function redessiner() {
-    var buffer = "";
-    for(var y=0; y<h; y++) {
-        var ligne = "";
-        for(var x=0; x<l; x++) {
-            if(x === 0 || x === l-1 || y === 0 || y === h-1) {
-                ligne += "#";
-            } else if(x === nourX && y === nourY) {
-                ligne += "O";
-            } else {
-                var estSerpent = false;
-                for(var i=0; i<snake.length; i++) {
-                    if(snake[i].x === x && snake[i].y === y) {
-                        estSerpent = true;
-                        break;
-                    }
-                }
-                ligne += estSerpent ? "X" : " ";
-            }
+    // --- GESTION DES VUES ---
+    function changerVue(nomVue) {
+        var vues = document.getElementsByClassName('vue');
+        for(var i = 0; i < vues.length; i++) {
+            vues[i].className = 'vue';
         }
-        buffer += ligne + "\n";
+        document.getElementById(nomVue).className = 'vue actif';
     }
-    document.getElementById('ecranJeu').innerHTML = buffer;
-}
 
-function fin() {
-    enJeu = false;
-    clearInterval(timer);
-    alert("Game Over ! Score : " + score);
-}
+    // --- MOTEUR SNAKE ---
+    var l = 38, h = 11;
+    var snake = [], dirActuelle = 'DROITE', prompDir = 'DROITE';
+    var nourX = 5, nourY = 5, score = 0, timer = null, enJeu = false;
+
+    function demarrerSnake() {
+        if(enJeu) return;
+        snake = [{x:10, y:5}, {x:9, y:5}, {x:8, y:5}];
+        dirActuelle = 'DROITE'; prompDir = 'DROITE';
+        score = 0;
+        document.getElementById('score').innerHTML = score;
+        enJeu = true;
+        genererNourriture();
+        if(timer) clearInterval(timer);
+        timer = setInterval(boucleSnake, 300);
+    }
+
+    function arreterSnake() {
+        enJeu = false;
+        if(timer) clearInterval(timer);
+    }
+
+    function dir(d) {
+        if(d === 'HAUT' && dirActuelle !== 'BAS') prompDir = 'HAUT';
+        if(d === 'BAS' && dirActuelle !== 'HAUT') prompDir = 'BAS';
+        if(d === 'GAUCHE' && dirActuelle !== 'DROITE') prompDir = 'GAUCHE';
+        if(d === 'DROITE' && dirActuelle !== 'GAUCHE') prompDir = 'DROITE';
+    }
+
+    function genererNourriture() {
+        nourX = Math.floor(Math.random() * (l - 2)) + 1;
+        nourY = Math.floor(Math.random() * (h - 2)) + 1;
+    }
+
+    function boucleSnake() {
+        dirActuelle = prompDir;
+        var tete = {x: snake[0].x, y: snake[0].y};
+        
+        if(dirActuelle === 'HAUT') tete.y--;
+        if(dirActuelle === 'BAS') tete.y++;
+        if(dirActuelle === 'GAUCHE') tete.x--;
+        if(dirActuelle === 'DROITE') tete.x++;
+
+        if(tete.x <= 0 || tete.x >= l-1 || tete.y <= 0 || tete.y >= h-1) {
+            finSnake(); return;
+        }
+        for(var i=0; i<snake.length; i++) {
+            if(snake[i].x === tete.x && snake[i].y === tete.y) { finSnake(); return; }
+        }
+
+        snake.unshift(tete);
+        if(tete.x === nourX && tete.y === nourY) {
+            score += 10;
+            document.getElementById('score').innerHTML = score;
+            genererNourriture();
+        } else {
+            snake.pop();
+        }
+
+        redessinerSnake();
+    }
+
+    function redessinerSnake() {
+        var buffer = "";
+        for(var y=0; y<h; y++) {
+            var ligne = "";
+            for(var x=0; x<l; x++) {
+                if(x === 0 || x === l-1 || y === 0 || y === h-1) {
+                    ligne += "#";
+                } else if(x === nourX && y === nourY) {
+                    ligne += "O";
+                } else {
+                    var estSerpent = false;
+                    for(var i=0; i<snake.length; i++) {
+                        if(snake[i].x === x && snake[i].y === y) { estSerpent = true; break; }
+                    }
+                    ligne += estSerpent ? "X" : " ";
+                }
+            }
+            buffer += ligne + "\n";
+        }
+        document.getElementById('ecranJeu').innerHTML = buffer;
+    }
+
+    function finSnake() {
+        enJeu = false;
+        clearInterval(timer);
+        alert("Game Over ! Score : " + score);
+        changerVue('vue-menu');
+    }
 </script>
 
 </body>
