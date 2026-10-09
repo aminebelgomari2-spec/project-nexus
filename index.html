@@ -2,10 +2,10 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>DS Home Menu</title>
+    <title>DS Portal Games</title>
     <style>
         body {
-            background-color: #000040; /* Bleu menu DS classique */
+            background-color: #000040;
             color: #ffffff;
             font-family: monospace;
             font-size: 11px;
@@ -15,26 +15,22 @@
         }
         h1 { font-size: 13px; color: #ffff00; margin: 4px 0; }
         
-        /* Les différents écrans (Menu ou Jeux) */
         .vue { display: none; }
         .vue.actif { display: block; }
 
-        /* Style des boutons du menu */
         .ds-menu-btn {
             display: block;
             background-color: #c0c0c0;
             color: #000000;
             border: 2px solid #ffffff;
             padding: 8px;
-            margin: 8px auto;
+            margin: 6px auto;
             width: 200px;
             font-weight: bold;
             text-decoration: none;
             font-size: 11px;
         }
-        .ds-menu-btn:active {
-            background-color: #ffffff;
-        }
+        .ds-menu-btn:active { background-color: #ffffff; }
 
         /* Style pour Snake */
         #ecranJeu {
@@ -62,6 +58,30 @@
             text-decoration: none;
             margin: 1px;
         }
+
+        /* Style pour le Morpion */
+        .morpion-grille {
+            margin: 10px auto;
+            border-collapse: collapse;
+        }
+        .morpion-grille td {
+            width: 35px;
+            height: 35px;
+            border: 2px solid #ffffff;
+            text-align: center;
+            vertical-align: middle;
+        }
+        .morpion-btn {
+            display: block;
+            width: 100%;
+            height: 100%;
+            background-color: #000060;
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: bold;
+            text-decoration: none;
+            line-height: 33px;
+        }
     </style>
 </head>
 <body>
@@ -72,7 +92,7 @@
         <p style="font-size:10px; color:#ccc;">Choisis un jeu au stylet :</p>
         
         <a class="ds-menu-btn" href="javascript:changerVue('vue-snake'); demarrerSnake();">🐍 Snake Turbo</a>
-        <a class="ds-menu-btn" href="javascript:changerVue('vue-morpion');">❌ Morpion (Bientôt)</a>
+        <a class="ds-menu-btn" href="javascript:changerVue('vue-morpion'); initialiserMorpion();">❌ Morpion (Tic-Tac-Toe)</a>
         
         <div style="margin-top: 15px; font-size: 9px; color: #888;">
             Navigateur DS - Opera Engine
@@ -100,12 +120,33 @@
     </div>
 
 
-    <!-- ================= VUE 3 : MORPION (PRÉPARATION) ================= -->
+    <!-- ================= VUE 3 : MORPION ================= -->
     <div id="vue-morpion" class="vue">
         <h1>MORPION DS</h1>
-        <p>Ce jeu arrive bientôt !</p>
-        <br><br>
-        <a class="ds-btn" href="javascript:changerVue('vue-menu');">RETOUR MENU</a>
+        <div id="morpionStatut" style="font-size: 10px; color: #ffff00; margin: 2px;">À toi de jouer (X)</div>
+        
+        <table class="morpion-grille">
+            <tr>
+                <td><a class="morpion-btn" href="javascript:jouerCase(0)" id="c0"></a></td>
+                <td><a class="morpion-btn" href="javascript:jouerCase(1)" id="c1"></a></td>
+                <td><a class="morpion-btn" href="javascript:jouerCase(2)" id="c2"></a></td>
+            </tr>
+            <tr>
+                <td><a class="morpion-btn" href="javascript:jouerCase(3)" id="c3"></a></td>
+                <td><a class="morpion-btn" href="javascript:jouerCase(4)" id="c4"></a></td>
+                <td><a class="morpion-btn" href="javascript:jouerCase(5)" id="c5"></a></td>
+            </tr>
+            <tr>
+                <td><a class="morpion-btn" href="javascript:jouerCase(6)" id="c6"></a></td>
+                <td><a class="morpion-btn" href="javascript:jouerCase(7)" id="c7"></a></td>
+                <td><a class="morpion-btn" href="javascript:jouerCase(8)" id="c8"></a></td>
+            </tr>
+        </table>
+
+        <div style="margin-top: 6px;">
+            <a class="ds-btn" href="javascript:initialiserMorpion()">Recommencer</a><br>
+            <a class="ds-btn" href="javascript:changerVue('vue-menu')" style="background:#550000; color:#ff9999; margin-top:4px;">RETOUR MENU</a>
+        </div>
     </div>
 
 
@@ -208,6 +249,96 @@
         clearInterval(timer);
         alert("Game Over ! Score : " + score);
         changerVue('vue-menu');
+    }
+
+    // --- MOTEUR MORPION ---
+    var plateau = ["", "", "", "", "", "", "", "", ""];
+    var tourJoueur = true; // true = X (joueur), false = O (ordi)
+    var jeuMorpionActif = true;
+
+    function initialiserMorpion() {
+        plateau = ["", "", "", "", "", "", "", "", ""];
+        tourJoueur = true;
+        jeuMorpionActif = true;
+        document.getElementById("morpionStatut").innerHTML = "À toi de jouer (X)";
+        for(var i=0; i<9; i++) {
+            document.getElementById("c" + i).innerHTML = "";
+        }
+    }
+
+    function jouerCase(index) {
+        if(!jeuMorpionActif || plateau[index] !== "" || !tourJoueur) return;
+
+        plateau[index] = "X";
+        document.getElementById("c" + index).innerHTML = "X";
+
+        if(verifierVictoire("X")) {
+            document.getElementById("morpionStatut").innerHTML = "Victoire ! GAGNÉ !";
+            jeuMorpionActif = false;
+            return;
+        }
+        if(verifierNul()) {
+            document.getElementById("morpionStatut").innerHTML = "Match nul !";
+            jeuMorpionActif = false;
+            return;
+        }
+
+        tourJoueur = false;
+        document.getElementById("morpionStatut").innerHTML = "L'ordinateur réfléchit...";
+        setTimeout(tourOrdi, 500);
+    }
+
+    function tourOrdi() {
+        if(!jeuMorpionActif) return;
+
+        // Trouver les cases vides
+        var vides = [];
+        for(var i=0; i<9; i++) {
+            if(plateau[i] === "") vides.push(i);
+        }
+
+        if(vides.length > 0) {
+            // Choix aléatoire simple pour l'ordi
+            var choix = vides[Math.floor(Math.random() * vides.length)];
+            plateau[choix] = "O";
+            document.getElementById("c" + choix).innerHTML = "O";
+
+            if(verifierVictoire("O")) {
+                document.getElementById("morpionStatut").innerHTML = "L'ordinateur a gagné !";
+                jeuMorpionActif = false;
+                return;
+            }
+            if(verifierNul()) {
+                document.getElementById("morpionStatut").innerHTML = "Match nul !";
+                jeuMorpionActif = false;
+                return;
+            }
+        }
+
+        tourJoueur = true;
+        document.getElementById("morpionStatut").innerHTML = "À toi de jouer (X)";
+    }
+
+    function verifierVictoire(symbole) {
+        var combi = [
+            [0,1,2], [3,4,5], [6,7,8], // Lignes
+            [0,3,6], [1,4,7], [2,5,8], // Colonnes
+            [0,4,8], [2,4,6]           // Diagonales
+        ];
+        for(var i=0; i<combi.length; i++) {
+            var c = combi[i];
+            if(plateau[c[0]] === symbole && plateau[c[1]] === symbole && plateau[c[2]] === symbole) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function verifierNul() {
+        for(var i=0; i<9; i++) {
+            if(plateau[i] === "") return false;
+        }
+        return true;
     }
 </script>
 
