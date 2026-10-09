@@ -2,234 +2,159 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Snake DS</title>
+    <title>Snake DS Turbo</title>
     <style>
         body {
             background-color: #000000;
             color: #00ff00;
             font-family: monospace;
-            font-size: 10px;
-            margin: 0;
-            padding: 2px;
-            text-align: center;
-        }
-
-        h1 {
             font-size: 11px;
-            color: #00ff00;
-            margin: 2px 0;
-        }
-
-        .container {
-            width: 240px;
-            margin: 0 auto;
-        }
-
-        /* Grille du Snake */
-        #grid {
-            border-collapse: collapse;
-            margin: 4px auto;
-            background-color: #111111;
-            border: 1px solid #00ff00;
-        }
-
-        #grid td {
-            width: 9px;
-            height: 9px;
-            padding: 0;
             margin: 0;
-        }
-
-        /* Éléments du jeu */
-        .snake {
-            background-color: #00ff00;
-        }
-
-        .food {
-            background-color: #ff0000;
-        }
-
-        .empty {
-            background-color: #111111;
-        }
-
-        .ds-btn {
-            background-color: #333333;
-            color: #00ff00;
-            border: 1px solid #00ff00;
-            font-family: monospace;
-            font-size: 10px;
-            padding: 3px 6px;
-            margin: 2px;
-            cursor: pointer;
-        }
-
-        .controls-table {
-            margin: 0 auto;
-        }
-
-        .controls-table td {
             padding: 2px;
             text-align: center;
+        }
+        h1 { font-size: 12px; margin: 2px 0; color: #00ff00; }
+        #ecranJeu {
+            background-color: #111111;
+            border: 1px solid #00ff00;
+            width: 230px;
+            height: 90px;
+            margin: 4px auto;
+            font-family: monospace;
+            font-size: 9px;
+            line-height: 8px;
+            text-align: left;
+            overflow: hidden;
+            white-space: pre;
+        }
+        .ds-btn {
+            background-color: #222;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            padding: 5px 10px;
+            font-size: 11px;
+            font-weight: bold;
+            margin: 2px;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>SNAKE DS</h1>
-        <div>Score: <span id="score">0</span></div>
+    <h1>SNAKE TURBO DS</h1>
+    <div>Score: <span id="score">0</span></div>
 
-        <!-- Plateau de jeu généré par JS (environ 20x12) -->
-        <table id="grid"></table>
+    <!-- Affichage texte ultra rapide (pas de tableaux) -->
+    <div id="ecranJeu">Appuie sur START pour jouer !</div>
 
-        <!-- Boutons de contrôle tactiles (idéal pour le stylet de la DS) -->
-        <table class="controls-table">
-            <tr>
-                <td></td>
-                <td><button class="ds-btn" onclick="changerDirection('HAUT')">^</button></td>
-                <td></td>
-            </tr>
-            <tr>
-                <td><button class="ds-btn" onclick="changerDirection('GAUCHE')">&lt;</button></td>
-                <td><button class="ds-btn" onclick="demarrerJeu()">START</button></td>
-                <td><button class="ds-btn" onclick="changerDirection('DROITE')">&gt;</button></td>
-            </tr>
-            <tr>
-                <td></td>
-                <td><button class="ds-btn" onclick="changerDirection('BAS')">v</button></td>
-                <td></td>
-            </tr>
-        </table>
+    <!-- Boutons corrigés et simplifiés pour réduire la latence -->
+    <div>
+        <button class="ds-btn" onclick="dir('HAUT')">HAUT</button><br>
+        <button class="ds-btn" onclick="dir('GAUCHE')">GAUCHE</button>
+        <button class="ds-btn" onclick="dir('DROITE')">DROITE</button><br>
+        <button class="ds-btn" onclick="dir('BAS')">BAS</button>
+    </div>
+    <div style="margin-top:4px;">
+        <button class="ds-btn" onclick="demarrer()" style="background:#004400;">START</button>
     </div>
 
-    <script>
-        var largeurGrille = 22;
-        var hauteurGrille = 11;
-        var snake = [];
-        var direction = 'DROITE';
-        var prochaineDirection = 'DROITE';
-        var nourriture = {x: 0, y: 0};
-        var score = 0;
-        var intervalJeu;
-        var enJeu = false;
+<script>
+var l = 38; // largeur
+var h = 11; // hauteur
+var snake = [];
+var dirActuelle = 'DROITE';
+var prompDir = 'DROITE';
+var nourX = 5, nourY = 5;
+var score = 0;
+var timer = null;
+var enJeu = false;
 
-        // Création de la grille HTML au chargement
-        var grilleTable = document.getElementById("grid");
-        for (var y = 0; y < hauteurGrille; y++) {
-            var ligne = grilleTable.insertRow();
-            for (var x = 0; x < largeurGrille; x++) {
-                var cellule = ligne.insertCell();
-                cellule.id = "cell_" + x + "_" + y;
-                cellule.className = "empty";
-            }
-        }
+function demarrer() {
+    if(enJeu) return;
+    snake = [{x:10, y:5}, {x:9, y:5}, {x:8, y:5}];
+    dirActuelle = 'DROITE';
+    prompDir = 'DROITE';
+    score = 0;
+    document.getElementById('score').innerHTML = score;
+    enJeu = true;
+    genererNourriture();
+    if(timer) clearInterval(timer);
+    timer = setInterval(boucle, 250); // Vitesse un poil plus lente pour laisser la DS respirer
+}
 
-        function demarrerJeu() {
-            if (enJeu) return;
-            
-            // Initialisation du serpent au centre
-            snake = [
-                {x: 5, y: 5},
-                {x: 4, y: 5},
-                {x: 3, y: 5}
-            ];
-            direction = 'DROITE';
-            prochaineDirection = 'DROITE';
-            score = 0;
-            document.getElementById("score").innerHTML = score;
-            enJeu = true;
+function dir(d) {
+    // Correction des directions inversées
+    if(d === 'HAUT' && dirActuelle !== 'BAS') prompDir = 'HAUT';
+    if(d === 'BAS' && dirActuelle !== 'HAUT') prompDir = 'BAS';
+    if(d === 'GAUCHE' && dirActuelle !== 'DROITE') prompDir = 'GAUCHE';
+    if(d === 'DROITE' && dirActuelle !== 'GAUCHE') prompDir = 'DROITE';
+}
 
-            genererNourriture();
-            
-            if (intervalJeu) clearInterval(intervalJeu);
-            // Vitesse du serpent (en millisecondes par tick)
-            intervalJeu = setInterval(boucleJeu, 180);
-        }
+function genererNourriture() {
+    nourX = Math.floor(Math.random() * (l - 2)) + 1;
+    nourY = Math.floor(Math.random() * (h - 2)) + 1;
+}
 
-        function changerDirection(dir) {
-            if (dir === 'HAUT' && direction !== 'BAS') prochaineDirection = 'HAUT';
-            if (dir === 'BAS' && direction !== 'HAUT') prochaineDirection = 'BAS';
-            if (dir === 'GAUCHE' && direction !== 'DROITE') prochaineDirection = 'GAUCHE';
-            if (dir === 'DROITE' && direction !== 'GAUCHE') prochaineDirection = 'DROITE';
-        }
+function boucle() {
+    dirActuelle = prompDir;
+    var tete = {x: snake[0].x, y: snake[0].y};
+    
+    if(dirActuelle === 'HAUT') tete.y--;
+    if(dirActuelle === 'BAS') tete.y++;
+    if(dirActuelle === 'GAUCHE') tete.x--;
+    if(dirActuelle === 'DROITE') tete.x++;
 
-        function genererNourriture() {
-            nourriture.x = Math.floor(Math.random() * largeurGrille);
-            nourriture.y = Math.floor(Math.random() * hauteurGrille);
-            
-            // Vérifier que la nourriture ne pop pas sur le serpent
-            for (var i = 0; i < snake.length; i++) {
-                if (snake[i].x === nourriture.x && snake[i].y === nourriture.y) {
-                    genererNourriture();
-                    break;
-                }
-            }
-        }
+    // Murs
+    if(tete.x <= 0 || tete.x >= l-1 || tete.y <= 0 || tete.y >= h-1) {
+        fin(); return;
+    }
+    // Auto-collision
+    for(var i=0; i<snake.length; i++) {
+        if(snake[i].x === tete.x && snake[i].y === tete.y) { fin(); return; }
+    }
 
-        function boucleJeu() {
-            direction = prochaineDirection;
-            
-            // Calcul de la nouvelle tête
-            var tete = {x: snake[0].x, y: snake[0].y};
-            if (direction === 'HAUT') tete.y--;
-            if (direction === 'BAS') tete.y++;
-            if (direction === 'GAUCHE') tete.x--;
-            if (direction === 'DROITE') tete.x++;
+    snake.unshift(tete);
+    if(tete.x === nourX && tete.y === nourY) {
+        score += 10;
+        document.getElementById('score').innerHTML = score;
+        genererNourriture();
+    } else {
+        snake.pop();
+    }
 
-            // Collisions (murs ou soi-même)
-            if (tete.x < 0 || tete.x >= largeurGrille || tete.y < 0 || tete.y >= hauteurGrille) {
-                finDePartie();
-                return;
-            }
-            for (var i = 0; i < snake.length; i++) {
-                if (snake[i].x === tete.x && snake[i].y === tete.y) {
-                    finDePartie();
-                    return;
-                }
-            }
+    redessiner();
+}
 
-            // Ajouter la nouvelle tête
-            snake.unshift(tete);
-
-            // Manger la nourriture ou avancer
-            if (tete.x === nourriture.x && tete.y === nourriture.y) {
-                score += 10;
-                document.getElementById("score").innerHTML = score;
-                genererNourriture();
+function redessiner() {
+    var buffer = "";
+    for(var y=0; y<h; y++) {
+        var ligne = "";
+        for(var x=0; x<l; x++) {
+            if(x === 0 || x === l-1 || y === 0 || y === h-1) {
+                ligne += "#";
+            } else if(x === nourX && y === nourY) {
+                ligne += "O";
             } else {
-                // Retirer la queue
-                snake.pop();
-            }
-
-            mettreAJourAffichage();
-        }
-
-        function mettreAJourAffichage() {
-            // Effacer toute la grille
-            for (var y = 0; y < hauteurGrille; y++) {
-                for (var x = 0; x < largeurGrille; x++) {
-                    document.getElementById("cell_" + x + "_" + y).className = "empty";
+                var estSerpent = false;
+                for(var i=0; i<snake.length; i++) {
+                    if(snake[i].x === x && snake[i].y === y) {
+                        estSerpent = true;
+                        break;
+                    }
                 }
-            }
-
-            // Afficher la nourriture (Rouge)
-            var cellNourriture = document.getElementById("cell_" + nourriture.x + "_" + nourriture.y);
-            if (cellNourriture) cellNourriture.className = "food";
-
-            // Afficher le serpent (Vert)
-            for (var i = 0; i < snake.length; i++) {
-                var cellSnake = document.getElementById("cell_" + snake[i].x + "_" + snake[i].y);
-                if (cellSnake) cellSnake.className = "snake";
+                ligne += estSerpent ? "X" : " ";
             }
         }
+        buffer += ligne + "\n";
+    }
+    document.getElementById('ecranJeu').innerHTML = buffer;
+}
 
-        function finDePartie() {
-            enJeu = false;
-            clearInterval(intervalJeu);
-            alert("Game Over ! Score : " + score);
-        }
-    </script>
+function fin() {
+    enJeu = false;
+    clearInterval(timer);
+    alert("Game Over ! Score : " + score);
+}
+</script>
 
 </body>
 </html>
