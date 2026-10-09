@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Snake DS Turbo</title>
+    <title>Snake DS Ultra</title>
     <style>
         body {
             background-color: #000000;
@@ -27,39 +27,45 @@
             overflow: hidden;
             white-space: pre;
         }
+        /* Style des boutons faits avec des liens (ultra-compatible DS) */
         .ds-btn {
-            background-color: #222;
+            display: inline-block;
+            background-color: #222222;
             color: #00ff00;
             border: 1px solid #00ff00;
-            padding: 5px 10px;
-            font-size: 11px;
+            padding: 4px 8px;
+            font-size: 10px;
             font-weight: bold;
+            text-decoration: none;
             margin: 2px;
+        }
+        .ds-btn:active {
+            background-color: #00ff00;
+            color: #000000;
         }
     </style>
 </head>
 <body>
 
-    <h1>SNAKE TURBO DS</h1>
+    <h1>SNAKE DS</h1>
     <div>Score: <span id="score">0</span></div>
 
-    <!-- Affichage texte ultra rapide (pas de tableaux) -->
-    <div id="ecranJeu">Appuie sur START pour jouer !</div>
+    <div id="ecranJeu">Appuie sur START !</div>
 
-    <!-- Boutons corrigés et simplifiés pour réduire la latence -->
+    <!-- Utilisation de liens <a> au lieu de <button> pour forcer la compatibilité tactile de la DS -->
     <div>
-        <button class="ds-btn" onclick="dir('HAUT')">HAUT</button><br>
-        <button class="ds-btn" onclick="dir('GAUCHE')">GAUCHE</button>
-        <button class="ds-btn" onclick="dir('DROITE')">DROITE</button><br>
-        <button class="ds-btn" onclick="dir('BAS')">BAS</button>
+        <a class="ds-btn" href="javascript:dir('HAUT');">^ HAUT</a><br>
+        <a class="ds-btn" href="javascript:dir('GAUCHE');">&lt; GAUCHE</a>
+        <a class="ds-btn" href="javascript:dir('DROITE');">DROITE &gt;</a><br>
+        <a class="ds-btn" href="javascript:dir('BAS');">v BAS</a>
     </div>
     <div style="margin-top:4px;">
-        <button class="ds-btn" onclick="demarrer()" style="background:#004400;">START</button>
+        <a class="ds-btn" href="javascript:demarrer();" style="background:#003300; color:#ffff00;">START</a>
     </div>
 
 <script>
-var l = 38; // largeur
-var h = 11; // hauteur
+var l = 38;
+var h = 11;
 var snake = [];
 var dirActuelle = 'DROITE';
 var prompDir = 'DROITE';
@@ -78,15 +84,17 @@ function demarrer() {
     enJeu = true;
     genererNourriture();
     if(timer) clearInterval(timer);
-    timer = setInterval(boucle, 250); // Vitesse un poil plus lente pour laisser la DS respirer
+    timer = setInterval(boucle, 300); // 300ms pour laisser largement le temps à la DS
 }
 
 function dir(d) {
-    // Correction des directions inversées
     if(d === 'HAUT' && dirActuelle !== 'BAS') prompDir = 'HAUT';
     if(d === 'BAS' && dirActuelle !== 'HAUT') prompDir = 'BAS';
     if(d === 'GAUCHE' && dirActuelle !== 'DROITE') prompDir = 'GAUCHE';
     if(d === 'DROITE' && dirActuelle !== 'GAUCHE') prompDir = 'DROITE';
+    
+    // Si le jeu n'a pas commencé, le bouton START lance aussi le jeu
+    if(!enJeu) demarrer();
 }
 
 function genererNourriture() {
@@ -103,11 +111,9 @@ function boucle() {
     if(dirActuelle === 'GAUCHE') tete.x--;
     if(dirActuelle === 'DROITE') tete.x++;
 
-    // Murs
     if(tete.x <= 0 || tete.x >= l-1 || tete.y <= 0 || tete.y >= h-1) {
         fin(); return;
     }
-    // Auto-collision
     for(var i=0; i<snake.length; i++) {
         if(snake[i].x === tete.x && snake[i].y === tete.y) { fin(); return; }
     }
