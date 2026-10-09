@@ -1,379 +1,87 @@
 <!DOCTYPE html>
-<html lang="fr" class="dark">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roblox - Accueil (Clone Web Parfait)</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        robloxDark: '#121212',
-                        robloxSidebar: '#1a1a1a',
-                        robloxCard: '#1f1f1f',
-                        robloxHover: '#2a2a2a',
-                        robloxBorder: '#2d2d2d'
-                    }
-                }
-            }
-        }
-    </script>
-    <!-- FontAwesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Menu Nintendo DS</title>
     <style>
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #121212; }
-        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #555; }
+        /* Style ultra-basique compatible vieux navigateurs (Opera 8) */
+        body {
+            background-color: #000080; /* Bleu rétro inspiré du menu DS */
+            color: #ffffff;
+            font-family: sans-serif;
+            font-size: 12px;
+            margin: 0;
+            padding: 5px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 14px;
+            color: #ffff00;
+            margin: 5px 0;
+        }
+
+        .container {
+            width: 240px; /* Adapté à la largeur de l'écran de la DS */
+            margin: 0 auto;
+        }
+
+        /* Boutons larges faciles à cliquer avec le stylet */
+        .ds-button {
+            display: block;
+            background-color: #c0c0c0;
+            color: #000000;
+            border: 2px solid #ffffff;
+            padding: 8px;
+            margin: 6px 0;
+            text-decoration: none;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .ds-button:hover {
+            background-color: #ffffff;
+            color: #000080;
+        }
+
+        .footer {
+            font-size: 10px;
+            color: #c0c0c0;
+            margin-top: 10px;
+        }
     </style>
 </head>
-<body class="bg-robloxDark text-white font-sans antialiased h-screen flex flex-col overflow-hidden select-none">
+<body>
 
-    <!-- 1. BARRE DE NAVIGATION SUPÉRIEURE -->
-    <header class="h-14 bg-robloxDark border-b border-robloxBorder flex items-center justify-between px-4 z-30">
-        <!-- Logo et Liens Gauche -->
-        <div class="flex items-center gap-6">
-            <div class="flex items-center gap-2">
-                <span class="font-black text-xl tracking-tighter uppercase">ROBLOX</span>
-                <span class="bg-neutral-800 text-neutral-300 text-[10px] font-bold px-2 py-0.5 rounded">SELECT</span>
-            </div>
-            <nav class="hidden md:flex items-center gap-6 text-xs font-semibold text-neutral-300">
-                <a href="#" class="hover:text-white transition-colors">Charts</a>
-                <a href="#" class="hover:text-white transition-colors">Marketplace</a>
-                <a href="#" class="hover:text-white transition-colors">Créer</a>
-                <a href="#" class="hover:text-white transition-colors">Robux</a>
-            </nav>
+    <div class="container">
+        <h1>Mon Portail DS</h1>
+        <p>Bienvenue sur ta page web optimisee !</p>
+
+        <!-- Liens sous forme de gros boutons tactiles -->
+        <a class="ds-button" href="http://www.google.com">Rechercher (Google)</a>
+        <a class="ds-button" href="#section2">Notes / Astuces</a>
+        <a class="ds-button" href="#contact">A propos</a>
+
+        <div style="background-color: #000060; border: 1px solid #ffffff; padding: 5px; margin-top: 10px; text-align: left;">
+            <a name="section2"></a>
+            <strong>Infos :</strong><br>
+            Ce site utilise un design en HTML/CSS pur compatible avec le navigateur Opera de la DS.
         </div>
 
-        <!-- Barre de recherche centrale -->
-        <div class="relative w-72 lg:w-96 hidden sm:block">
-            <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-neutral-400">
-                <i class="fa-solid fa-magnifying-glass text-xs"></i>
-            </span>
-            <input type="text" placeholder="Rechercher" class="w-full bg-neutral-900 border border-neutral-700 text-xs rounded-full pl-10 pr-4 py-2 text-white focus:outline-none focus:border-white transition-all">
-        </div>
-
-        <!-- Éléments Droite (Profil, Robux, Notifs, Paramètres) -->
-        <div class="flex items-center gap-3">
-            <div class="flex items-center gap-1.5 bg-neutral-900 border border-neutral-800 px-3 py-1 rounded-full text-xs font-bold">
-                <i class="fa-solid fa-coins text-amber-400 text-xs"></i>
-                <span>6</span>
-            </div>
-            <button class="w-8 h-8 rounded-full bg-neutral-900 border border-neutral-800 text-neutral-300 hover:text-white flex items-center justify-center relative">
-                <i class="fa-regular fa-bell text-xs"></i>
-                <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-600 rounded-full"></span>
-            </button>
-            <button class="w-8 h-8 rounded-full bg-neutral-900 border border-neutral-800 text-neutral-300 hover:text-white flex items-center justify-center">
-                <i class="fa-solid fa-gear text-xs"></i>
-            </button>
-            <div class="flex items-center gap-2 pl-2 border-l border-neutral-800 cursor-pointer">
-                <div class="w-7 h-7 rounded-full bg-indigo-600 flex items-center justify-center font-bold text-xs">B</div>
-                <span class="text-xs font-semibold hidden lg:inline">Baloubalou_55</span>
-            </div>
-        </div>
-    </header>
-
-    <!-- 2. CONTENEUR PRINCIPAL (SIDEBAR + CONTENU) -->
-    <div class="flex-1 flex overflow-hidden">
-        
-        <!-- BARRE LATÉRALE GAUCHE COMPLÈTE -->
-        <aside class="w-64 bg-robloxSidebar border-r border-robloxBorder flex flex-col justify-between overflow-y-auto z-20">
-            <div class="p-3 space-y-1">
-                <div class="px-3 py-2 text-xs font-bold text-neutral-400 truncate">Baloubalou_55</div>
-                
-                <button onclick="switchTab('home')" id="nav-home" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all bg-neutral-800 text-white">
-                    <i class="fa-solid fa-house w-5 text-center text-sm"></i> Accueil
-                </button>
-                <button onclick="switchTab('profile')" id="nav-profile" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-neutral-400 hover:text-white hover:bg-robloxHover transition-all">
-                    <i class="fa-solid fa-user w-5 text-center text-sm"></i> Profil
-                </button>
-                <button onclick="switchTab('robloxplus')" id="nav-robloxplus" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-neutral-400 hover:text-white hover:bg-robloxHover transition-all">
-                    <i class="fa-solid fa-star w-5 text-center text-sm text-amber-400"></i> Roblox Plus
-                </button>
-                <button onclick="switchTab('messages')" id="nav-messages" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold text-neutral-400 hover:text-white hover:bg-robloxHover transition-all">
-                    <span class="flex items-center gap-3"><i class="fa-solid fa-message w-5 text-center text-sm"></i> Messages</span>
-                    <span class="bg-neutral-800 text-white text-[10px] px-1.5 py-0.5 rounded-full">1</span>
-                </button>
-                <button onclick="switchTab('amis')" id="nav-amis" class="nav-btn w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-semibold text-neutral-400 hover:text-white hover:bg-robloxHover transition-all">
-                    <span class="flex items-center gap-3"><i class="fa-solid fa-user-group w-5 text-center text-sm"></i> Amis</span>
-                    <span class="bg-neutral-800 text-white text-[10px] px-1.5 py-0.5 rounded-full">7</span>
-                </button>
-                <button onclick="switchTab('avatar')" id="nav-avatar" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-neutral-400 hover:text-white hover:bg-robloxHover transition-all">
-                    <i class="fa-solid fa-shirt w-5 text-center text-sm"></i> Avatar
-                </button>
-                <button onclick="switchTab('inventaire')" id="nav-inventaire" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-neutral-400 hover:text-white hover:bg-robloxHover transition-all">
-                    <i class="fa-solid fa-box-archive w-5 text-center text-sm"></i> Inventaire
-                </button>
-                <button onclick="switchTab('echange')" id="nav-echange" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-neutral-400 hover:text-white hover:bg-robloxHover transition-all">
-                    <i class="fa-solid fa-right-left w-5 text-center text-sm"></i> Échange
-                </button>
-                <button onclick="switchTab('communautes')" id="nav-communautes" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-neutral-400 hover:text-white hover:bg-robloxHover transition-all">
-                    <i class="fa-solid fa-users w-5 text-center text-sm"></i> Communautés
-                </button>
-                <button onclick="switchTab('presse')" id="nav-presse" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-neutral-400 hover:text-white hover:bg-robloxHover transition-all">
-                    <i class="fa-solid fa-newspaper w-5 text-center text-sm"></i> Salle de presse
-                </button>
-                <button onclick="switchTab('boutique')" id="nav-boutique" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-neutral-400 hover:text-white hover:bg-robloxHover transition-all">
-                    <i class="fa-solid fa-shop w-5 text-center text-sm"></i> Boutique officielle
-                </button>
-                <button onclick="switchTab('cartes')" id="nav-cartes" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold text-neutral-400 hover:text-white hover:bg-robloxHover transition-all">
-                    <i class="fa-solid fa-credit-card w-5 text-center text-sm"></i> Acheter des cartes-cadeaux
-                </button>
-            </div>
-
-            <!-- Bas de sidebar (Encart promo Roblox Plus) -->
-            <div class="p-3 m-3 bg-neutral-900 border border-neutral-800 rounded-xl space-y-1">
-                <p class="text-[11px] text-neutral-300">Plus de fun pour moins de Robux. Abonne-toi à Roblox Plus.</p>
-            </div>
-        </aside>
-
-        <!-- CONTENU PRINCIPAL (PAGE ACCUEIL) -->
-        <main class="flex-1 overflow-y-auto p-6 space-y-6">
-            
-            <!-- VUE ACCUEIL -->
-            <div id="tab-content-home" class="tab-content space-y-6">
-                
-                <div class="flex items-center justify-between">
-                    <h1 class="text-2xl font-bold">Accueil</h1>
-                </div>
-
-                <!-- SECTION AMIS (322) -->
-                <div class="space-y-3">
-                    <div class="flex items-center justify-between">
-                        <h3 class="text-sm font-bold text-neutral-200">Amis (322)</h3>
-                        <a href="#" class="text-xs text-neutral-400 hover:underline">Tout voir →</a>
-                    </div>
-                    
-                    <div class="flex gap-4 overflow-x-auto pb-2 scrollbar-none">
-                        <!-- Ajouter un ami -->
-                        <div class="flex flex-col items-center gap-1.5 cursor-pointer group flex-shrink-0">
-                            <div class="w-14 h-14 rounded-full bg-neutral-800 border border-neutral-700 flex items-center justify-center text-white relative group-hover:border-neutral-500 transition-all">
-                                <i class="fa-solid fa-plus text-sm"></i>
-                                <span class="absolute top-0 right-0 w-4 h-4 bg-red-600 rounded-full text-[10px] font-bold flex items-center justify-center text-white">2</span>
-                            </div>
-                            <span class="text-[11px] text-neutral-400">Ajouter des a...</span>
-                        </div>
-
-                        <!-- Ami 1 -->
-                        <div onclick="toggleFriendPopup(event, 'Un_noob')" class="flex flex-col items-center gap-1.5 cursor-pointer group flex-shrink-0 relative">
-                            <div class="w-14 h-14 rounded-full bg-neutral-800 border border-neutral-700 overflow-hidden relative group-hover:border-neutral-500">
-                                <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=150&auto=format&fit=crop" class="w-full h-full object-cover">
-                                <span class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-emerald-500 border-2 border-robloxDark rounded-full"></span>
-                            </div>
-                            <span class="text-[11px] text-neutral-300 truncate w-16 text-center">Un_noob</span>
-                        </div>
-
-                        <!-- Ami 2 -->
-                        <div onclick="toggleFriendPopup(event, 'Be Mad')" class="flex flex-col items-center gap-1.5 cursor-pointer group flex-shrink-0">
-                            <div class="w-14 h-14 rounded-full bg-neutral-800 border border-neutral-700 overflow-hidden relative group-hover:border-neutral-500">
-                                <img src="https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?q=80&w=150&auto=format&fit=crop" class="w-full h-full object-cover">
-                                <span class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-emerald-500 border-2 border-robloxDark rounded-full"></span>
-                            </div>
-                            <span class="text-[11px] text-neutral-300 truncate w-16 text-center">Be Mad</span>
-                        </div>
-
-                        <!-- Ami 3 -->
-                        <div onclick="toggleFriendPopup(event, 'Amigos')" class="flex flex-col items-center gap-1.5 cursor-pointer group flex-shrink-0">
-                            <div class="w-14 h-14 rounded-full bg-neutral-800 border border-neutral-700 overflow-hidden relative group-hover:border-neutral-500">
-                                <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=150&auto=format&fit=crop" class="w-full h-full object-cover">
-                                <span class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-emerald-500 border-2 border-robloxDark rounded-full"></span>
-                            </div>
-                            <span class="text-[11px] text-neutral-300 truncate w-16 text-center">Amigos</span>
-                        </div>
-
-                        <!-- Ami 4 -->
-                        <div class="flex flex-col items-center gap-1.5 cursor-pointer group flex-shrink-0">
-                            <div class="w-14 h-14 rounded-full bg-neutral-800 border border-neutral-700 overflow-hidden relative group-hover:border-neutral-500">
-                                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=150&auto=format&fit=crop" class="w-full h-full object-cover">
-                                <span class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-emerald-500 border-2 border-robloxDark rounded-full"></span>
-                            </div>
-                            <span class="text-[11px] text-neutral-300 truncate w-16 text-center">rip_cat</span>
-                        </div>
-
-                        <!-- Ami 5 -->
-                        <div class="flex flex-col items-center gap-1.5 cursor-pointer group flex-shrink-0">
-                            <div class="w-14 h-14 rounded-full bg-neutral-800 border border-neutral-700 overflow-hidden relative group-hover:border-neutral-500">
-                                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=150&auto=format&fit=crop" class="w-full h-full object-cover">
-                                <span class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-emerald-500 border-2 border-robloxDark rounded-full"></span>
-                            </div>
-                            <span class="text-[11px] text-neutral-300 truncate w-16 text-center">NOPPERX2</span>
-                        </div>
-
-                        <!-- Ami 6 -->
-                        <div class="flex flex-col items-center gap-1.5 cursor-pointer group flex-shrink-0">
-                            <div class="w-14 h-14 rounded-full bg-neutral-800 border border-neutral-700 overflow-hidden relative group-hover:border-neutral-500">
-                                <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=150&auto=format&fit=crop" class="w-full h-full object-cover">
-                                <span class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-emerald-500 border-2 border-robloxDark rounded-full"></span>
-                            </div>
-                            <span class="text-[11px] text-neutral-300 truncate w-16 text-center">love_ly7799</span>
-                        </div>
-
-                        <!-- Ami 7 -->
-                        <div class="flex flex-col items-center gap-1.5 cursor-pointer group flex-shrink-0">
-                            <div class="w-14 h-14 rounded-full bg-neutral-800 border border-neutral-700 overflow-hidden relative group-hover:border-neutral-500">
-                                <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?q=80&w=150&auto=format&fit=crop" class="w-full h-full object-cover">
-                                <span class="absolute bottom-0 right-0 w-3.5 h-3.5 bg-emerald-500 border-2 border-robloxDark rounded-full"></span>
-                            </div>
-                            <span class="text-[11px] text-neutral-300 truncate w-16 text-center">bastit_38</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- SECTION RECOMMANDÉ POUR VOUS (GRILLE DE JEUX) -->
-                <div class="space-y-4 pt-4">
-                    <h2 class="text-sm font-bold text-neutral-200">Recommandé pour vous</h2>
-                    
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                        
-                        <!-- Jeu 1 -->
-                        <div onclick="openGameModal('Vallée de Huss')" class="bg-robloxCard rounded-2xl overflow-hidden border border-neutral-800 hover:border-neutral-600 transition-all cursor-pointer group shadow-lg">
-                            <div class="h-40 bg-neutral-800 relative overflow-hidden">
-                                <img src="https://images.unsplash.com/photo-1538481199705-c710c4e965fc?q=80&w=400&auto=format&fit=crop" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                            </div>
-                            <div class="p-3.5 space-y-1">
-                                <h3 class="font-bold text-xs text-white truncate">Vallée de Huss</h3>
-                                <p class="text-[11px] text-neutral-400 flex items-center gap-1">
-                                    <i class="fa-solid fa-user text-[9px]"></i> D3fault16
-                                </p>
-                            </div>
-                        </div>
-
-                        <!-- Jeu 2 -->
-                        <div onclick="openGameModal('MM2 Entraîneur de visée 2')" class="bg-robloxCard rounded-2xl overflow-hidden border border-neutral-800 hover:border-neutral-600 transition-all cursor-pointer group shadow-lg">
-                            <div class="h-40 bg-neutral-800 relative overflow-hidden">
-                                <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=400&auto=format&fit=crop" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                            </div>
-                            <div class="p-3.5 space-y-1">
-                                <h3 class="font-bold text-xs text-white truncate">MM2 Entraîneur de visée 2</h3>
-                                <p class="text-[11px] text-neutral-400 flex items-center gap-1">
-                                    <i class="fa-solid fa-thumbs-up text-[9px] text-emerald-500"></i> 90% note
-                                </p>
-                            </div>
-                        </div>
-
-                        <!-- Jeu 3 -->
-                        <div onclick="openGameModal('Contrôle de temps de Zyku')" class="bg-robloxCard rounded-2xl overflow-hidden border border-neutral-800 hover:border-neutral-600 transition-all cursor-pointer group shadow-lg">
-                            <div class="h-40 bg-neutral-800 relative overflow-hidden">
-                                <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=400&auto=format&fit=crop" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                            </div>
-                            <div class="p-3.5 space-y-1">
-                                <h3 class="font-bold text-xs text-white truncate">Contrôle de temps de Zyku</h3>
-                                <p class="text-[11px] text-neutral-400 flex items-center gap-1">
-                                    <i class="fa-solid fa-thumbs-up text-[9px] text-emerald-500"></i> 56% note
-                                </p>
-                            </div>
-                        </div>
-
-                        <!-- Jeu 4 -->
-                        <div onclick="openGameModal('Clavier ASMR Wallhop Tower')" class="bg-robloxCard rounded-2xl overflow-hidden border border-neutral-800 hover:border-neutral-600 transition-all cursor-pointer group shadow-lg">
-                            <div class="h-40 bg-neutral-800 relative overflow-hidden">
-                                <img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=400&auto=format&fit=crop" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
-                            </div>
-                            <div class="p-3.5 space-y-1">
-                                <h3 class="font-bold text-xs text-white truncate">Clavier ASMR Wallhop Tower</h3>
-                                <p class="text-[11px] text-neutral-400 flex items-center gap-1">
-                                    <i class="fa-solid fa-thumbs-up text-[9px] text-emerald-500"></i> 85% note
-                                </p>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- AUTRES VUES (VIDES POUR L'INSTANT) -->
-            <div id="tab-content-other" class="tab-content hidden space-y-4">
-                <h1 id="other-title" class="text-2xl font-bold">Section</h1>
-                <p class="text-xs text-neutral-400">Chargement de la page...</p>
-            </div>
-
-        </main>
-    </div>
-
-    <!-- POPUP AMI SIMILAIRE À TON IMAGE -->
-    <div id="friend-popup" class="hidden absolute bg-neutral-900 border border-neutral-700 shadow-2xl rounded-2xl p-4 w-72 z-50 space-y-3">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-full bg-neutral-800 overflow-hidden">
-                <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=150&auto=format&fit=crop" class="w-full h-full object-cover">
-            </div>
-            <div>
-                <h4 id="popup-friend-name" class="font-bold text-xs text-white">Nom d'ami</h4>
-                <p class="text-[10px] text-neutral-400">School FR RP [Chance... ]</p>
-            </div>
-        </div>
-        <div class="space-y-1.5 pt-1">
-            <button onclick="launchGame()" class="w-full bg-[#00b06f] hover:bg-[#00c87d] text-white font-bold text-xs py-2 rounded-xl transition-all cursor-pointer">Rejoindre</button>
-            <button onclick="closeFriendPopup()" class="w-full bg-neutral-800 hover:bg-neutral-700 text-white font-semibold text-xs py-2 rounded-xl transition-all cursor-pointer">Discuter</button>
-            <button onclick="closeFriendPopup()" class="w-full text-neutral-400 hover:text-white font-medium text-[11px] py-1 transition-all cursor-pointer">Voir le profil</button>
+        <div class="footer">
+            &copy; 2026 - Retro Web DS
         </div>
     </div>
 
-    <!-- CHAT FLOTTANT BAS DROITE COMME SUR TON IMAGE -->
-    <div class="absolute bottom-0 right-6 bg-neutral-900 border border-neutral-800 border-b-0 rounded-t-xl w-64 h-10 flex items-center justify-between px-4 z-40 shadow-xl cursor-pointer">
-        <span class="text-xs font-bold text-white">Chat</span>
-        <i class="fa-solid fa-pen-to-square text-xs text-neutral-400"></i>
-    </div>
-
-    <!-- SCRIPT JAVASCRIPT FIDÈLE -->
+    <!-- Script JS simple si besoin -->
     <script>
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            
-            if(tabId === 'home') {
-                document.getElementById('tab-content-home').classList.remove('hidden');
-            } else {
-                const other = document.getElementById('tab-content-other');
-                other.classList.remove('hidden');
-                document.getElementById('other-title').innerText = tabId.charAt(0).toUpperCase() + tabId.slice(1);
-            }
-
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('bg-neutral-800', 'text-white');
-                btn.classList.add('text-neutral-400', 'hover:text-white', 'hover:bg-robloxHover');
-            });
-
-            const activeBtn = document.getElementById('nav-' + tabId);
-            if(activeBtn) {
-                activeBtn.classList.remove('text-neutral-400', 'hover:text-white', 'hover:bg-robloxHover');
-                activeBtn.classList.add('bg-neutral-800', 'text-white');
-            }
-            closeFriendPopup();
-        }
-
-        function toggleFriendPopup(event, friendName) {
-            event.stopPropagation();
-            const popup = document.getElementById('friend-popup');
-            document.getElementById('popup-friend-name').innerText = friendName;
-            
-            // Positionner le popup près du clic
-            const rect = event.currentTarget.getBoundingClientRect();
-            popup.style.top = (rect.bottom + 10) + 'px';
-            popup.style.left = rect.left + 'px';
-            
-            popup.classList.toggle('hidden');
-        }
-
-        function closeFriendPopup() {
-            document.getElementById('friend-popup').classList.add('hidden');
-        }
-
-        window.onclick = function() {
-            closeFriendPopup();
-        }
-
-        function openGameModal(gameName) {
-            alert("Lancement du jeu : " + gameName + " 🚀");
-        }
-
-        function launchGame() {
-            closeFriendPopup();
-            alert("Rejoignage de la session de l'ami en cours...");
+        // Petit script de test compatible JS 1.5
+        function alerteDS() {
+            alert("La DS execute du JavaScript !");
         }
     </script>
+    <br>
+    <button onclick="alerteDS()" style="background:#c0c0c0; border:1px solid #000;">Test JS</button>
+
 </body>
 </html>
