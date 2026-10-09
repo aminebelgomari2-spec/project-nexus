@@ -114,19 +114,20 @@
             background-color: #663300;
         }
 
-        /* Style pour le Rickroll ASCII */
-        .rick-art {
-            background-color: #000000;
-            border: 1px dashed #ff00ff;
-            color: #ff66ff;
-            font-family: monospace;
-            font-size: 8px;
-            line-height: 8px;
-            white-space: pre;
-            text-align: center;
+        /* Style pour le Pixel Art Rickroll */
+        .rick-grid {
+            display: inline-block;
+            border: 2px solid #555;
+            background-color: #9da8b6;
             margin: 4px auto;
-            width: 230px;
-            padding: 4px;
+        }
+        .rick-row {
+            font-size: 0;
+        }
+        .px {
+            display: inline-block;
+            width: 7px;
+            height: 7px;
         }
     </style>
 </head>
@@ -246,27 +247,19 @@
     </div>
 
 
-    <!-- ================= VUE 6 : RICKROLL ================= -->
+    <!-- ================= VUE 6 : RICKROLL PIXEL ART ================= -->
     <div id="vue-rick" class="vue">
-        <h1 style="color:#ff66ff;">RICKROLLED !</h1>
+        <h1 style="color:#ff66ff; margin:2px 0;">RICKROLLED !</h1>
         
-        <div class="rick-art">
-  o--o  o   o  o-O-o o-O-o  o--o  o     o
-  |   | |   |    |     |    |   | |     |
-  O--o  |   |    |     |    O--o  |     |
-  |   | |   |    |     |    |   | |     |
-  o--o   o-o     o     o    o--o   o-o-o 
-        </div>
+        <!-- Grille Pixel Art générée par script pour correspondre à ton image -->
+        <div id="rickCanvasContainer"></div>
 
-        <div style="font-size: 9px; color: #ffff00; margin: 4px;">
+        <div style="font-size: 9px; color: #ffff00; margin: 2px;">
             "Never gonna give you up..."
-        </div>
-        <div style="font-size: 8px; color: #ccc; margin-bottom: 8px;">
-            Tu t'es fait piéger sur Nintendo DS !
         </div>
 
         <div>
-            <a class="ds-btn" href="javascript:changerVue('vue-menu')" style="background:#550000; color:#ff9999;">RETOUR MENU</a>
+            <a class="ds-btn" href="javascript:changerVue('vue-menu')" style="background:#550000; color:#ff9999; margin-top:2px;">RETOUR MENU</a>
         </div>
     </div>
 
@@ -279,6 +272,70 @@
             vues[i].className = 'vue';
         }
         document.getElementById(nomVue).className = 'vue actif';
+        if(nomVue === 'vue-rick') {
+            genererRickPixelArt();
+        }
+    }
+
+    // --- GENERATEUR PIXEL ART RICKROLL ---
+    function genererRickPixelArt() {
+        var container = document.getElementById("rickCanvasContainer");
+        if(container.innerHTML !== "") return; // Généré une seule fois
+
+        // Palette de couleurs inspirée de ton image (Fond gris, costume marron/noir, visage chair)
+        var c = {
+            bg: "#9da8b6",
+            bgL: "#b8c2d0",
+            skin: "#c89f8c",
+            skinDark: "#a07864",
+            hair: "#503828",
+            suit: "#3c3228",
+            suitDark: "#282019",
+            tie: "#b4a08c"
+        };
+
+        // Matrice simplifiée 26 colonnes x 16 lignes inspirée de l'image
+        var matrice = [
+            "00000000001111110000000000",
+            "00000000011222211000000000",
+            "00000000122333322100000000",
+            "00000001233333333210000000",
+            "00000001334444433100000000",
+            "00000001344444443100000000",
+            "00000000344555443000000000",
+            "00000000344444443000000000",
+            "00000000034444430000000000",
+            "00000000034666430000000000",
+            "00000001134444431100000000",
+            "00000017774777477710000000",
+            "00000178877777778871000000",
+            "00001788887777778888710000",
+            "00111788888777788888711100",
+            "01888788888777788888788810"
+        ];
+
+        var html = '<div class="rick-grid">';
+        for(var y=0; y<matrice.length; y++) {
+            html += '<div class="rick-row">';
+            var ligne = matrice[y];
+            for(var x=0; x<ligne.length; x++) {
+                var code = ligne[x];
+                var couleur = c.bg;
+                if(code === '1') couleur = c.bgL;
+                if(code === '2') couleur = c.hair;
+                if(code === '3') couleur = c.skinDark;
+                if(code === '4') couleur = c.skin;
+                if(code === '5') couleur = c.tie;
+                if(code === '6') couleur = c.skinDark;
+                if(code === '7') couleur = c.suit;
+                if(code === '8') couleur = c.suitDark;
+                
+                html += '<span class="px" style="background-color:' + couleur + ';"></span>';
+            }
+            html += '</div>';
+        }
+        html += '</div>';
+        container.innerHTML = html;
     }
 
     // --- MOTEUR SNAKE ---
