@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project Nexus - Complet avec Moteur 3D & Studio</title>
+    <title>Roblox - Application Officielle (Clone Parfait)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -12,341 +12,299 @@
             theme: {
                 extend: {
                     colors: {
-                        nexusDark: '#0f1015',
-                        nexusCard: '#1a1b22',
-                        nexusHover: '#252630',
-                        nexusGreen: '#00b06f',
-                        nexusGreenHover: '#00c87d'
+                        robloxBg: '#121212',
+                        robloxCard: '#1f1f1f',
+                        robloxHover: '#2c2c2c',
+                        robloxRed: '#e52b35',
+                        robloxRedHover: '#ff3b44'
                     }
                 }
             }
         }
     </script>
-    <!-- FontAwesome & Three.js pour la 3D -->
+    <!-- FontAwesome pour les icônes exactes -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #0f1015; }
-        ::-webkit-scrollbar-thumb { background: #252630; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #3a3b48; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #121212; }
+        ::-webkit-scrollbar-thumb { background: #2c2c2c; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #444; }
     </style>
 </head>
-<body class="bg-nexusDark text-gray-100 font-sans antialiased h-screen flex overflow-hidden select-none">
+<body class="bg-robloxBg text-white font-sans antialiased h-screen flex overflow-hidden select-none">
 
-    <!-- 1. ÉCRAN DE JEU EN PLEIN ÉCRAN (CLIENT 3D) -->
-    <div id="game-client-screen" class="fixed inset-0 bg-black z-50 hidden flex flex-col">
-        <!-- Barre supérieure du jeu -->
-        <div class="h-14 bg-gray-900/80 backdrop-blur border-b border-gray-800 flex items-center justify-between px-6 z-10">
-            <div class="flex items-center gap-3">
-                <span class="w-3 h-3 rounded-full bg-nexusGreen animate-pulse"></span>
-                <span id="active-game-title-hud" class="font-bold text-white text-sm">Jeu en cours</span>
-            </div>
-            <button onclick="quitGameSession()" class="bg-red-600/80 hover:bg-red-600 text-white px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer">Quitter le jeu</button>
-        </div>
-        <!-- Conteneur du rendu 3D Three.js -->
-        <div id="game-canvas-container" class="flex-1 relative">
-            <!-- Aide commandes -->
-            <div class="absolute bottom-6 left-6 bg-black/60 backdrop-blur p-4 rounded-xl border border-gray-800 text-xs text-gray-300 pointer-events-none space-y-1">
-                <p class="font-bold text-white">Commandes :</p>
-                <p>• Déplacement : <span class="text-nexusGreen font-mono">Z Q S D</span> ou <span class="text-nexusGreen font-mono">Flèches</span></p>
-                <p>• Sauter : <span class="text-nexusGreen font-mono">ESPACE</span></p>
-            </div>
-        </div>
-    </div>
-
-    <!-- 2. ÉCRAN DE NEXUS STUDIO (ÉDITEUR 3D TYPE ROBLOX STUDIO) -->
-    <div id="studio-screen" class="fixed inset-0 bg-nexusDark z-50 hidden flex flex-col">
-        <!-- Top Bar Studio -->
-        <div class="h-14 bg-nexusCard border-b border-gray-800 flex items-center justify-between px-6 z-10">
-            <div class="flex items-center gap-4">
-                <div class="flex items-center gap-2 text-nexusGreen font-bold">
-                    <i class="fa-solid fa-hammer"></i> NEXUS STUDIO
-                </div>
-                <div class="h-6 w-[1px] bg-gray-800"></div>
-                <button onclick="studioAddBlock()" class="bg-nexusHover hover:bg-gray-700 text-white px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-2 cursor-pointer">
-                    <i class="fa-solid fa-cube text-nexusGreen"></i> Ajouter un Bloc
-                </button>
-            </div>
-            <button onclick="closeStudio()" class="bg-gray-800 hover:bg-gray-700 text-white px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer">Fermer Studio</button>
-        </div>
-        <!-- Layout Éditeur -->
-        <div class="flex-1 flex overflow-hidden">
-            <!-- Explorateur gauche -->
-            <div class="w-64 bg-nexusCard border-r border-gray-800 p-4 space-y-2 select-none">
-                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Explorateur</h3>
-                <div class="space-y-1 text-sm">
-                    <div class="p-2 rounded bg-nexusHover/50 text-white flex items-center gap-2"><i class="fa-solid fa-globe text-nexusGreen"></i> Workspace</div>
-                    <div class="pl-6 space-y-1 text-xs text-gray-300">
-                        <div class="p-1 rounded hover:bg-nexusHover cursor-pointer">📦 Baseplate</div>
-                        <div class="p-1 rounded hover:bg-nexusHover cursor-pointer">👤 SpawnLocation</div>
-                    </div>
-                </div>
-            </div>
-            <!-- Viewport 3D Studio -->
-            <div id="studio-canvas-container" class="flex-1 relative bg-neutral-950"></div>
-            <!-- Propriétés droite -->
-            <div class="w-72 bg-nexusCard border-l border-gray-800 p-4 space-y-4">
-                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Propriétés</h3>
-                <div class="space-y-3 text-xs">
-                    <div>
-                        <label class="text-gray-400">Nom de l'objet</label>
-                        <input type="text" value="Baseplate" class="w-full mt-1 bg-nexusDark border border-gray-800 p-2 rounded text-white">
-                    </div>
-                    <div>
-                        <label class="text-gray-400">Couleur (Hex)</label>
-                        <input type="color" value="#00b06f" class="w-full mt-1 h-8 bg-nexusDark border border-gray-800 rounded cursor-pointer">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- ÉCRAN DE CHARGEMENT GÉNÉRAL -->
-    <div id="game-loading-screen" class="fixed inset-0 bg-black/90 backdrop-blur-md z-40 hidden flex-col items-center justify-center space-y-6">
-        <div class="w-16 h-16 bg-nexusGreen rounded-2xl flex items-center justify-center shadow-lg shadow-nexusGreen/50 animate-bounce">
-            <i class="fa-solid fa-cube text-white text-2xl"></i>
-        </div>
-        <div class="text-center space-y-2">
-            <h2 id="loading-title" class="text-2xl font-bold text-white">Connexion au serveur...</h2>
-            <p id="loading-status" class="text-sm text-gray-400">Chargement des scripts (0%)</p>
-        </div>
-        <div class="w-80 h-2 bg-nexusCard rounded-full overflow-hidden border border-gray-800">
-            <div id="loading-bar" class="h-full bg-nexusGreen transition-all duration-200" style="width: 0%;"></div>
-        </div>
-    </div>
-
-    <!-- BARRE LATÉRALE LAUNCHER -->
-    <aside class="w-64 bg-nexusCard flex flex-col justify-between border-r border-gray-800 z-20">
+    <!-- 1. BARRE LATÉRALE GAUCHE (STYLE ROBLOX APP) -->
+    <aside class="w-20 lg:w-64 bg-robloxCard flex flex-col justify-between border-r border-neutral-800 z-20 transition-all duration-300">
         <div>
-            <div class="h-16 flex items-center px-6 gap-3 border-b border-gray-800/60">
-                <div class="w-9 h-9 bg-nexusGreen rounded-xl flex items-center justify-center shadow-lg shadow-nexusGreen/30">
-                    <i class="fa-solid fa-cube text-white text-lg"></i>
+            <!-- Logo / Icône haut -->
+            <div class="h-20 flex items-center px-4 lg:px-6 gap-3">
+                <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-md">
+                    <i class="fa-solid fa-cube text-black text-xl"></i>
                 </div>
-                <span class="font-bold text-xl tracking-wider bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">NEXUS</span>
+                <span class="hidden lg:inline font-black text-xl tracking-tighter uppercase">Roblox</span>
             </div>
-            <nav class="p-4 space-y-1.5">
-                <button onclick="switchTab('home')" id="nav-home" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl text-sm font-medium transition-all bg-nexusGreen text-white shadow-md shadow-nexusGreen/20 cursor-pointer">
-                    <i class="fa-solid fa-house w-5 text-center"></i> Accueil
+
+            <!-- Liens de navigation -->
+            <nav class="px-3 space-y-1">
+                <button onclick="switchTab('home')" id="nav-home" class="nav-btn w-full flex items-center gap-4 px-3.5 py-3 rounded-xl font-medium text-sm transition-all bg-neutral-800 text-white shadow-sm">
+                    <i class="fa-solid fa-house w-5 text-center text-lg"></i>
+                    <span class="hidden lg:inline">Accueil</span>
                 </button>
-                <button onclick="switchTab('discover')" id="nav-discover" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:text-white hover:bg-nexusHover transition-all cursor-pointer">
-                    <i class="fa-solid fa-compass w-5 text-center"></i> Découvrir
+                <button onclick="switchTab('discover')" id="nav-discover" class="nav-btn w-full flex items-center gap-4 px-3.5 py-3 rounded-xl font-medium text-sm text-neutral-400 hover:text-white hover:bg-robloxHover transition-all">
+                    <i class="fa-solid fa-compass w-5 text-center text-lg"></i>
+                    <span class="hidden lg:inline">Découvrir</span>
                 </button>
-                <button onclick="switchTab('create')" id="nav-create" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:text-white hover:bg-nexusHover transition-all cursor-pointer">
-                    <i class="fa-solid fa-hammer w-5 text-center"></i> Créer (Studio)
+                <button onclick="switchTab('avatar')" id="nav-avatar" class="nav-btn w-full flex items-center gap-4 px-3.5 py-3 rounded-xl font-medium text-sm text-neutral-400 hover:text-white hover:bg-robloxHover transition-all">
+                    <i class="fa-solid fa-shirt w-5 text-center text-lg"></i>
+                    <span class="hidden lg:inline">Avatar</span>
+                </button>
+                <button onclick="switchTab('inventory')" id="nav-inventory" class="nav-btn w-full flex items-center gap-4 px-3.5 py-3 rounded-xl font-medium text-sm text-neutral-400 hover:text-white hover:bg-robloxHover transition-all">
+                    <i class="fa-solid fa-box-archive w-5 text-center text-lg"></i>
+                    <span class="hidden lg:inline">Inventaire</span>
+                </button>
+                <button onclick="switchTab('trade')" id="nav-trade" class="nav-btn w-full flex items-center gap-4 px-3.5 py-3 rounded-xl font-medium text-sm text-neutral-400 hover:text-white hover:bg-robloxHover transition-all">
+                    <i class="fa-solid fa-store w-5 text-center text-lg"></i>
+                    <span class="hidden lg:inline">Boutique</span>
                 </button>
             </nav>
         </div>
+
+        <!-- Profil bas de page -->
+        <div class="p-3 border-t border-neutral-800">
+            <div class="flex items-center gap-3 p-2 rounded-xl hover:bg-robloxHover cursor-pointer transition-all">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-red-600 to-orange-500 flex items-center justify-center font-bold text-white shadow-inner">
+                    RB
+                </div>
+                <div class="hidden lg:block overflow-hidden flex-1">
+                    <div class="text-xs font-bold truncate text-white">RobloxPlayer</div>
+                    <div class="text-[10px] text-emerald-500 flex items-center gap-1">En ligne</div>
+                </div>
+            </div>
+        </div>
     </aside>
 
-    <!-- CONTENEUR PRINCIPAL -->
+    <!-- 2. CONTENEUR PRINCIPAL -->
     <div class="flex-1 flex flex-col h-screen overflow-hidden">
-        <header class="h-16 bg-nexusCard/50 backdrop-blur-md border-b border-gray-800 flex items-center justify-between px-8 z-10">
-            <div class="relative w-96">
-                <input type="text" oninput="filterGames(this.value)" placeholder="Rechercher des jeux..." class="w-full bg-nexusDark border border-gray-800 text-sm rounded-xl px-4 py-2.5 text-gray-200 focus:outline-none focus:border-nexusGreen">
+        
+        <!-- EN-TÊTE (HEADER ROBLOX) -->
+        <header class="h-16 bg-robloxBg border-b border-neutral-800/80 flex items-center justify-between px-6 z-10">
+            <!-- Barre de recherche globale -->
+            <div class="relative w-72 lg:w-96">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-neutral-400">
+                    <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                </span>
+                <input type="text" placeholder="Rechercher..." class="w-full bg-neutral-900 border border-neutral-800 text-xs rounded-full pl-10 pr-4 py-2 text-white focus:outline-none focus:border-neutral-500 transition-all">
             </div>
+
+            <!-- Solde Robux (Monnaie) et Notifs -->
             <div class="flex items-center gap-4">
-                <div class="flex items-center gap-2 bg-nexusDark px-4 py-2 rounded-xl border border-gray-800">
-                    <i class="fa-solid fa-coins text-yellow-500"></i>
-                    <span id="user-coins" class="font-bold text-sm text-white">4850</span>
+                <div class="flex items-center gap-2 bg-neutral-900 border border-neutral-800 px-3.5 py-1.5 rounded-full">
+                    <i class="fa-solid fa-coins text-amber-400 text-xs"></i>
+                    <span class="font-bold text-xs">1,250</span>
+                    <button class="w-4 h-4 bg-neutral-800 hover:bg-neutral-700 rounded-full flex items-center justify-center text-[10px] font-bold">+</button>
                 </div>
+                <button class="w-9 h-9 rounded-full bg-neutral-900 border border-neutral-800 text-neutral-400 hover:text-white flex items-center justify-center transition-colors">
+                    <i class="fa-regular fa-bell text-sm"></i>
+                </button>
             </div>
         </header>
 
-        <main class="flex-1 overflow-y-auto p-8 relative">
-            <!-- ACCUEIL -->
-            <div id="tab-content-home" class="tab-content space-y-6">
-                <h2 class="text-xl font-bold text-white flex items-center gap-2"><i class="fa-solid fa-fire text-orange-500"></i> Jeux Populaires</h2>
-                <div id="games-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
-            </div>
-
-            <!-- CRÉER (ESPACE STUDIO) -->
-            <div id="tab-content-create" class="tab-content hidden space-y-6">
-                <div class="flex justify-between items-center">
-                    <h1 class="text-2xl font-bold text-white">Espace Créateur</h1>
-                    <button onclick="openStudio()" class="bg-nexusGreen hover:bg-nexusGreenHover text-white font-bold px-5 py-2.5 rounded-xl text-sm cursor-pointer">Ouvrir Nexus Studio 🚀</button>
-                </div>
-                <div class="bg-nexusCard border border-gray-800 rounded-2xl p-6 flex items-center justify-between">
-                    <div>
-                        <h3 class="text-lg font-bold text-white">Mon Premier Jeu 3D</h3>
-                        <p class="text-xs text-gray-400">Modifié récemment</p>
+        <!-- ZONE DE CONTENU DYNAMIQUE -->
+        <main class="flex-1 overflow-y-auto p-6 lg:p-8 space-y-8">
+            
+            <!-- VUE ACCUEIL -->
+            <div id="tab-content-home" class="tab-content space-y-8">
+                
+                <!-- Carrousel / Bannière de mise en avant -->
+                <div class="relative w-full h-56 lg:h-64 rounded-3xl overflow-hidden bg-neutral-900 border border-neutral-800 shadow-2xl flex flex-col justify-end p-6 lg:p-8">
+                    <div class="absolute inset-0 bg-cover bg-center opacity-40" style="background-image: url('https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=1200&auto=format&fit=crop');"></div>
+                    <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
+                    <div class="relative z-10 space-y-2 max-w-lg">
+                        <span class="bg-red-600/30 text-red-400 border border-red-500/30 text-[10px] font-bold px-2.5 py-1 rounded-md uppercase tracking-wider">Événement Spécial</span>
+                        <h1 class="text-2xl lg:text-3xl font-extrabold text-white">Blox Fruits & Metaverse Championship</h1>
+                        <p class="text-xs text-neutral-300 line-clamp-2">Découvre de nouveaux mondes, affronte des boss épiques et remporte des objets exclusifs pour ton avatar.</p>
+                        <div class="pt-2">
+                            <button onclick="openGameModal('Blox Fruits Championship')" class="bg-white hover:bg-neutral-200 text-black font-extrabold text-xs px-6 py-2.5 rounded-full shadow-lg transition-all flex items-center gap-2 cursor-pointer">
+                                <i class="fa-solid fa-play text-xs"></i> Jouer
+                            </button>
+                        </div>
                     </div>
-                    <button onclick="openStudio()" class="bg-nexusHover hover:bg-gray-700 text-white font-semibold px-5 py-2 rounded-xl text-sm border border-gray-700 cursor-pointer">Ouvrir</button>
+                </div>
+
+                <!-- Ligne de Catégories (Filtres style Roblox) -->
+                <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
+                    <button class="bg-white text-black text-xs font-bold px-4 py-2 rounded-full whitespace-nowrap">Tous</button>
+                    <button class="bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-neutral-300 text-xs font-semibold px-4 py-2 rounded-full whitespace-nowrap transition-colors">Aventure</button>
+                    <button class="bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-neutral-300 text-xs font-semibold px-4 py-2 rounded-full whitespace-nowrap transition-colors">Combat</button>
+                    <button class="bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-neutral-300 text-xs font-semibold px-4 py-2 rounded-full whitespace-nowrap transition-colors">Simulation</button>
+                    <button class="bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-neutral-300 text-xs font-semibold px-4 py-2 rounded-full whitespace-nowrap transition-colors">Tycoon</button>
+                    <button class="bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-neutral-300 text-xs font-semibold px-4 py-2 rounded-full whitespace-nowrap transition-colors">FPS</button>
+                </div>
+
+                <!-- Section : Recommandé pour vous (Grille de jeux Roblox) -->
+                <div class="space-y-4">
+                    <h2 class="text-lg font-bold text-white">Recommandé pour vous</h2>
+                    
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 lg:gap-5">
+                        
+                        <!-- Carte Jeu 1 -->
+                        <div onclick="openGameModal('Adopt Me! (Clone)')" class="group cursor-pointer space-y-2">
+                            <div class="w-full aspect-square bg-neutral-900 rounded-2xl overflow-hidden border border-neutral-800 group-hover:border-neutral-600 transition-all shadow-md relative">
+                                <img src="https://images.unsplash.com/photo-1538481199705-c710c4e965fc?q=80&w=400&auto=format&fit=crop" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" alt="Jeu">
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-xs text-white truncate group-hover:underline">Adopt Pets & Trade!</h3>
+                                <div class="flex items-center gap-2 pt-0.5 text-[10px] text-neutral-400">
+                                    <span class="flex items-center gap-1"><i class="fa-solid fa-star text-amber-400 text-[9px]"></i> 95%</span>
+                                    <span>•</span>
+                                    <span class="flex items-center gap-1"><i class="fa-solid fa-user text-[9px]"></i> 45.2K</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Carte Jeu 2 -->
+                        <div onclick="openGameModal('Bloxburg City')" class="group cursor-pointer space-y-2">
+                            <div class="w-full aspect-square bg-neutral-900 rounded-2xl overflow-hidden border border-neutral-800 group-hover:border-neutral-600 transition-all shadow-md relative">
+                                <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=400&auto=format&fit=crop" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" alt="Jeu">
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-xs text-white truncate group-hover:underline">Bloxburg Life & Build</h3>
+                                <div class="flex items-center gap-2 pt-0.5 text-[10px] text-neutral-400">
+                                    <span class="flex items-center gap-1"><i class="fa-solid fa-star text-amber-400 text-[9px]"></i> 91%</span>
+                                    <span>•</span>
+                                    <span class="flex items-center gap-1"><i class="fa-solid fa-user text-[9px]"></i> 28.1K</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Carte Jeu 3 -->
+                        <div onclick="openGameModal('BedWars Ultimate')" class="group cursor-pointer space-y-2">
+                            <div class="w-full aspect-square bg-neutral-900 rounded-2xl overflow-hidden border border-neutral-800 group-hover:border-neutral-600 transition-all shadow-md relative">
+                                <img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=400&auto=format&fit=crop" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" alt="Jeu">
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-xs text-white truncate group-hover:underline">BedWars PvP Arena</h3>
+                                <div class="flex items-center gap-2 pt-0.5 text-[10px] text-neutral-400">
+                                    <span class="flex items-center gap-1"><i class="fa-solid fa-star text-amber-400 text-[9px]"></i> 93%</span>
+                                    <span>•</span>
+                                    <span class="flex items-center gap-1"><i class="fa-solid fa-user text-[9px]"></i> 19.4K</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Carte Jeu 4 -->
+                        <div onclick="openGameModal('Tower Hell Obby')" class="group cursor-pointer space-y-2">
+                            <div class="w-full aspect-square bg-neutral-900 rounded-2xl overflow-hidden border border-neutral-800 group-hover:border-neutral-600 transition-all shadow-md relative">
+                                <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=400&auto=format&fit=crop" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" alt="Jeu">
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-xs text-white truncate group-hover:underline">Tower of Hell (Hard)</h3>
+                                <div class="flex items-center gap-2 pt-0.5 text-[10px] text-neutral-400">
+                                    <span class="flex items-center gap-1"><i class="fa-solid fa-star text-amber-400 text-[9px]"></i> 88%</span>
+                                    <span>•</span>
+                                    <span class="flex items-center gap-1"><i class="fa-solid fa-user text-[9px]"></i> 12.0K</span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- VUE DÉCOUVRIR -->
+            <div id="tab-content-discover" class="tab-content hidden space-y-4">
+                <h1 class="text-xl font-bold text-white">Découvrir</h1>
+                <p class="text-xs text-neutral-400">Explore les mondes créés par la communauté.</p>
+            </div>
+
+            <!-- VUE AVATAR -->
+            <div id="tab-content-avatar" class="tab-content hidden space-y-4">
+                <h1 class="text-xl font-bold text-white">Éditeur d'Avatar</h1>
+                <div class="bg-neutral-900 border border-neutral-800 rounded-2xl p-6 h-96 flex items-center justify-center text-neutral-500 text-xs">
+                    [ Aperçu 3D du personnage Roblox ]
                 </div>
             </div>
 
-            <!-- PAGE DÉTAIL JEU -->
-            <div id="tab-content-gamepage" class="tab-content hidden space-y-6">
-                <button onclick="switchTab('home')" class="text-sm text-gray-400 hover:text-white flex items-center gap-2 cursor-pointer"><i class="fa-solid fa-arrow-left"></i> Retour</button>
-                <div class="bg-nexusCard border border-gray-800 rounded-2xl p-6 space-y-6">
-                    <div class="flex gap-6 items-start">
-                        <img id="game-banner-img" src="" class="w-96 h-56 rounded-xl object-cover shadow-lg" alt="Jeu">
-                        <div class="space-y-4">
-                            <h1 id="game-title" class="text-3xl font-extrabold text-white">Titre</h1>
-                            <button onclick="launchGameSession()" class="bg-nexusGreen hover:bg-nexusGreenHover text-white font-extrabold text-lg px-10 py-4 rounded-2xl shadow-xl shadow-nexusGreen/30 cursor-pointer flex items-center gap-3">
-                                <i class="fa-solid fa-play"></i> JOUER MAINTENANT
+            <!-- VUE INVENTAIRE -->
+            <div id="tab-content-inventory" class="tab-content hidden space-y-4">
+                <h1 class="text-xl font-bold text-white">Inventaire</h1>
+                <p class="text-xs text-neutral-400">Retrouve tes accessoires et vêtements achetés.</p>
+            </div>
+
+            <!-- VUE BOUTIQUE -->
+            <div id="tab-content-trade" class="tab-content hidden space-y-4">
+                <h1 class="text-xl font-bold text-white">Boutique d'avatars</h1>
+                <p class="text-xs text-neutral-400">Personnalise ton look avec des objets uniques.</p>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- MODALE DE JEU OFFICIELLE ROBLOX (QUAND ON CLIQUE SUR UN JEU) -->
+    <div id="game-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+        <div class="bg-neutral-900 border border-neutral-800 w-full max-w-2xl rounded-3xl overflow-hidden shadow-2xl flex flex-col">
+            <!-- Header modale -->
+            <div class="flex items-center justify-between px-6 py-4 border-b border-neutral-800">
+                <h3 id="modal-game-title" class="font-bold text-sm text-white">Titre du jeu</h3>
+                <button onclick="closeGameModal()" class="text-neutral-400 hover:text-white text-sm cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <!-- Corps modale -->
+            <div class="p-6 space-y-6">
+                <div class="flex flex-col sm:flex-row gap-6">
+                    <div class="w-full sm:w-48 aspect-square bg-neutral-800 rounded-2xl overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1538481199705-c710c4e965fc?q=80&w=400&auto=format&fit=crop" class="w-full h-full object-cover">
+                    </div>
+                    <div class="flex-1 space-y-3">
+                        <h2 id="modal-game-subtitle" class="text-xl font-extrabold text-white">Nom du jeu</h2>
+                        <p class="text-xs text-neutral-400 leading-relaxed">Bienvenue dans cette expérience immersive ! Plonge dans l'action, relève les défis et amuse-toi avec des milliers de joueurs en ligne.</p>
+                        <div class="pt-2">
+                            <!-- LE BOUTON VERT EMBLÉMATIQUE DE ROBLOX -->
+                            <button onclick="launchRobloxGame()" class="bg-[#00b06f] hover:bg-[#00c87d] text-white font-extrabold text-xs px-8 py-3.5 rounded-full shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer w-full sm:w-auto">
+                                <i class="fa-solid fa-play text-xs"></i> JOUER
                             </button>
                         </div>
                     </div>
                 </div>
             </div>
-        </main>
+        </div>
     </div>
 
-    <!-- JAVASCRIPT AVEC MOTEUR THREE.JS -->
+    <!-- JAVASCRIPT DE NAVIGATION -->
     <script>
-        let gamesData = [
-            { id: 1, title: "Blox Battle Royale 3D", author: "NexusStudios", players: "14.2K", image: "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?q=80&w=500&auto=format&fit=crop" }
-        ];
-        let activeGame = null;
-        let gameRenderer, gameScene, gameCamera, playerMesh;
-        let studioRenderer, studioScene, studioCamera;
-        let keys = {};
-
-        window.onload = function() { renderGames(gamesData); };
-
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.getElementById('tab-content-' + tabId).classList.remove('hidden');
-        }
 
-        function renderGames(data) {
-            let html = '';
-            data.forEach(g => {
-                html += `
-                    <div onclick="openGamePage(${g.id})" class="bg-nexusCard rounded-2xl overflow-hidden border border-gray-800 hover:border-nexusGreen/50 cursor-pointer group shadow-lg">
-                        <div class="h-40 bg-gray-700"><img src="${g.image}" class="w-full h-full object-cover group-hover:scale-105 transition-transform"></div>
-                        <div class="p-4"><h3 class="font-bold text-white">${g.title}</h3><p class="text-xs text-gray-400">Par ${g.author}</p></div>
-                    </div>
-                `;
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('bg-neutral-800', 'text-white', 'shadow-sm');
+                btn.classList.add('text-neutral-400', 'hover:text-white', 'hover:bg-robloxHover');
             });
-            document.getElementById('games-grid').innerHTML = html;
+
+            const activeBtn = document.getElementById('nav-' + tabId);
+            if(activeBtn) {
+                activeBtn.classList.remove('text-neutral-400', 'hover:text-white', 'hover:bg-robloxHover');
+                activeBtn.classList.add('bg-neutral-800', 'text-white', 'shadow-sm');
+            }
         }
 
-        function openGamePage(id) {
-            activeGame = gamesData.find(g => g.id === id);
-            document.getElementById('game-title').innerText = activeGame.title;
-            document.getElementById('game-banner-img').src = activeGame.image;
-            switchTab('gamepage');
+        function openGameModal(gameName) {
+            document.getElementById('modal-game-title').innerText = gameName;
+            document.getElementById('modal-game-subtitle').innerText = gameName;
+            const modal = document.getElementById('game-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
         }
 
-        // --- LANCEMENT DU JEU 3D ---
-        function launchGameSession() {
-            const screen = document.getElementById('game-loading-screen');
-            screen.classList.remove('hidden'); screen.classList.add('flex');
-            let bar = document.getElementById('loading-bar');
-            bar.style.width = '100%';
-
-            setTimeout(() => {
-                screen.classList.add('hidden'); screen.classList.remove('flex');
-                document.getElementById('game-client-screen').classList.remove('hidden');
-                document.getElementById('active-game-title-hud').innerText = activeGame.title;
-                initThreeJSGame();
-            }, 600);
+        function closeGameModal() {
+            const modal = document.getElementById('game-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
         }
 
-        function quitGameSession() {
-            document.getElementById('game-client-screen').classList.add('hidden');
-            location.reload();
-        }
-
-        function initThreeJSGame() {
-            const container = document.getElementById('game-canvas-container');
-            container.innerHTML = '';
-            gameScene = new THREE.Scene();
-            gameScene.background = new THREE.Color(0x0f1015);
-
-            gameCamera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
-            gameRenderer = new THREE.WebGLRenderer({ antialias: true });
-            gameRenderer.setSize(container.clientWidth, container.clientHeight);
-            container.appendChild(gameRenderer.domElement);
-
-            // Lumière
-            const light = new THREE.DirectionalLight(0xffffff, 1);
-            light.position.set(10, 20, 10);
-            gameScene.add(light);
-            gameScene.add(new THREE.AmbientLight(0x404040));
-
-            // Sol (Baseplate)
-            const floorGeo = new THREE.PlaneGeometry(50, 50);
-            const floorMat = new THREE.MeshStandardMaterial({ color: 0x1a1b22 });
-            const floor = new THREE.Mesh(floorGeo, floorMat);
-            floor.rotation.x = -Math.PI / 2;
-            gameScene.add(floor);
-
-            // Joueur (Cube avatar)
-            const playerGeo = new THREE.BoxGeometry(1, 2, 1);
-            const playerMat = new THREE.MeshStandardMaterial({ color: 0x00b06f });
-            playerMesh = new THREE.Mesh(playerGeo, playerMat);
-            playerMesh.position.set(0, 1, 0);
-            gameScene.add(playerMesh);
-
-            gameCamera.position.set(0, 5, 8);
-            gameCamera.lookAt(playerMesh.position);
-
-            window.addEventListener('keydown', (e) => keys[e.code] = true);
-            window.addEventListener('keyup', (e) => keys[e.code] = false);
-
-            animateGame();
-        }
-
-        function animateGame() {
-            requestAnimationFrame(animateGame);
-            let speed = 0.1;
-            if (keys['KeyW'] || keys['ArrowUp']) playerMesh.position.z -= speed;
-            if (keys['KeyS'] || keys['ArrowDown']) playerMesh.position.z += speed;
-            if (keys['KeyA'] || keys['ArrowLeft']) playerMesh.position.x -= speed;
-            if (keys['KeyD'] || keys['ArrowRight']) playerMesh.position.x += speed;
-
-            gameCamera.position.x = playerMesh.position.x;
-            gameCamera.position.z = playerMesh.position.z + 8;
-            gameCamera.lookAt(playerMesh.position);
-
-            gameRenderer.render(gameScene, gameCamera);
-        }
-
-        // --- NEXUS STUDIO (ÉDITEUR 3D) ---
-        function openStudio() {
-            document.getElementById('studio-screen').classList.remove('hidden');
-            initThreeJSStudio();
-        }
-
-        function closeStudio() {
-            document.getElementById('studio-screen').classList.add('hidden');
-        }
-
-        function initThreeJSStudio() {
-            const container = document.getElementById('studio-canvas-container');
-            container.innerHTML = '';
-            studioScene = new THREE.Scene();
-            studioScene.background = new THREE.Color(0x121318);
-
-            studioCamera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
-            studioRenderer = new THREE.WebGLRenderer({ antialias: true });
-            studioRenderer.setSize(container.clientWidth, container.clientHeight);
-            container.appendChild(studioRenderer.domElement);
-
-            studioScene.add(new THREE.DirectionalLight(0xffffff, 1));
-            studioScene.add(new THREE.AmbientLight(0x505050));
-
-            // Sol studio
-            const gridHelper = new THREE.GridHelper(50, 50, 0x00b06f, 0x333333);
-            studioScene.add(gridHelper);
-
-            studioCamera.position.set(5, 5, 5);
-            studioCamera.lookAt(0, 0, 0);
-
-            studioRenderer.render(studioScene, studioCamera);
-        }
-
-        function studioAddBlock() {
-            const geom = new THREE.BoxGeometry(2, 2, 2);
-            const mat = new THREE.MeshStandardMaterial({ color: 0x00b06f });
-            const cube = new THREE.Mesh(geom, mat);
-            cube.position.set((Math.random() - 0.5) * 10, 1, (Math.random() - 0.5) * 10);
-            studioScene.add(cube);
-            studioRenderer.render(studioScene, studioCamera);
-            alert("Bloc ajouté dans la scène de Nexus Studio !");
+        function launchRobloxGame() {
+            closeGameModal();
+            alert("Ouverture du client Roblox... Connexion au serveur sécurisé en cours 🚀");
         }
     </script>
 </body>
