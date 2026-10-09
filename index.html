@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="fr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Nexus - Launcher</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        nexusDark: '#0f1015',
+                        nexusCard: '#1a1b22',
+                        nexusHover: '#252630',
+                        nexusGreen: '#00b06f',
+                        nexusGreenHover: '#00c87d'
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome pour les icônes -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Personnalisation de la scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f1015; }
+        ::-webkit-scrollbar-thumb { background: #252630; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #3a3b48; }
+    </style>
+</head>
+<body class="bg-nexusDark text-gray-100 font-sans antialiased h-screen flex overflow-hidden">
+
+    <!-- 1. BARRE LATÉRALE GAUCHE (SIDEBAR) -->
+    <aside class="w-64 bg-nexusCard flex flex-col justify-between border-r border-gray-800 select-none z-20">
+        <div>
+            <!-- Logo / Brand -->
+            <div class="h-16 flex items-center px-6 gap-3 border-b border-gray-800/60">
+                <div class="w-9 h-9 bg-nexusGreen rounded-xl flex items-center justify-center shadow-lg shadow-nexusGreen/30">
+                    <i class="fa-solid fa-cube text-white text-lg"></i>
+                </div>
+                <span class="font-bold text-xl tracking-wider bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">NEXUS</span>
+            </div>
+
+            <!-- Navigation Links -->
+            <nav class="p-4 space-y-1.5">
+                <button onclick="switchTab('home')" id="nav-home" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl text-sm font-medium transition-all bg-nexusGreen text-white shadow-md shadow-nexusGreen/20">
+                    <i class="fa-solid fa-house w-5 text-center"></i> Accueil
+                </button>
+                <button onclick="switchTab('discover')" id="nav-discover" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:text-white hover:bg-nexusHover transition-all">
+                    <i class="fa-solid fa-compass w-5 text-center"></i> Découvrir
+                </button>
+                <button onclick="switchTab('avatar')" id="nav-avatar" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:text-white hover:bg-nexusHover transition-all">
+                    <i class="fa-solid fa-shirt w-5 text-center"></i> Avatar
+                </button>
+                <button onclick="switchTab('create')" id="nav-create" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:text-white hover:bg-nexusHover transition-all">
+                    <i class="fa-solid fa-hammer w-5 text-center"></i> Créer (Studio)
+                </button>
+                <button onclick="switchTab('shop')" id="nav-shop" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:text-white hover:bg-nexusHover transition-all">
+                    <i class="fa-solid fa-store w-5 text-center"></i> Boutique
+                </button>
+                <button onclick="switchTab('friends')" id="nav-friends" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:text-white hover:bg-nexusHover transition-all">
+                    <i class="fa-solid fa-user-group w-5 text-center"></i> Amis & Messages
+                </button>
+            </nav>
+        </div>
+
+        <!-- Profil Utilisateur en bas de sidebar -->
+        <div class="p-4 border-t border-gray-800/60">
+            <div class="flex items-center gap-3 p-2 rounded-xl bg-nexusHover/50 border border-gray-800">
+                <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center font-bold text-white shadow-inner">
+                    NX
+                </div>
+                <div class="overflow-hidden flex-1">
+                    <div class="text-sm font-semibold truncate text-white">NexusDeveloper</div>
+                    <div class="text-xs text-nexusGreen flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full bg-nexusGreen animate-pulse"></span> En Ligne
+                    </div>
+                </div>
+                <button class="text-gray-400 hover:text-white p-2 transition-colors"><i class="fa-solid fa-gear"></i></button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- 2. CONTENEUR PRINCIPAL -->
+    <div class="flex-1 flex flex-col h-screen overflow-hidden">
+        
+        <!-- EN-TÊTE (HEADER) -->
+        <header class="h-16 bg-nexusCard/50 backdrop-blur-md border-b border-gray-800 flex items-center justify-between px-8 z-10">
+            <!-- Barre de recherche -->
+            <div class="relative w-96">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-gray-400">
+                    <i class="fa-solid fa-magnifying-glass text-sm"></i>
+                </span>
+                <input type="text" placeholder="Rechercher des jeux, des avatars, des créateurs..." class="w-full bg-nexusDark border border-gray-800 text-sm rounded-xl pl-11 pr-4 py-2.5 text-gray-200 focus:outline-none focus:border-nexusGreen transition-all">
+            </div>
+
+            <!-- Élément Droite (Monnaie & Notifs) -->
+            <div class="flex items-center gap-4">
+                <!-- Solde Nexus Coins (Robux) -->
+                <div class="flex items-center gap-2 bg-nexusDark px-4 py-2 rounded-xl border border-gray-800">
+                    <i class="fa-solid fa-coins text-yellow-500"></i>
+                    <span class="font-bold text-sm tracking-wide text-white">4,850</span>
+                    <button class="ml-1 w-5 h-5 bg-nexusGreen hover:bg-nexusGreenHover text-white rounded-md flex items-center justify-center text-xs font-bold transition-colors">+</button>
+                </div>
+                <!-- Notifications -->
+                <button class="w-10 h-10 rounded-xl bg-nexusDark border border-gray-800 text-gray-400 hover:text-white flex items-center justify-center transition-colors relative">
+                    <i class="fa-solid fa-bell"></i>
+                    <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
+                </button>
+            </div>
+        </header>
+
+        <!-- CONTENU DYNAMIQUE (CHANGEMENT DE VUE) -->
+        <main class="flex-1 overflow-y-auto p-8 relative">
+            
+            <!-- VUE 1 : ACCUEIL (HOME) -->
+            <div id="tab-content-home" class="tab-content space-y-8">
+                <!-- Bannière d'accueil -->
+                <div class="relative w-full h-64 rounded-2xl overflow-hidden bg-gradient-to-r from-purple-900 via-indigo-900 to-nexusDark p-8 flex flex-col justify-center shadow-xl border border-gray-800">
+                    <div class="absolute right-0 top-0 w-1/2 h-full opacity-30 bg-cover bg-center pointer-events-none" style="background-image: url('https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=1000&auto=format&fit=crop');"></div>
+                    <div class="relative z-10 max-w-lg space-y-3">
+                        <span class="bg-nexusGreen/20 text-nexusGreen border border-nexusGreen/30 text-xs font-semibold px-3 py-1 rounded-full uppercase tracking-wider">Mise à jour v2.0</span>
+                        <h1 class="text-3xl font-extrabold text-white">Bienvenue sur Project Nexus</h1>
+                        <p class="text-gray-300 text-sm">Découvre des milliers de mondes immersifs créés par la communauté, ou lance Nexus Studio pour construire ton propre jeu.</p>
+                        <div class="pt-2 flex gap-3">
+                            <button onclick="switchTab('discover')" class="bg-nexusGreen hover:bg-nexusGreenHover text-white font-bold px-6 py-2.5 rounded-xl text-sm transition-all shadow-lg shadow-nexusGreen/20">Explorer les jeux</button>
+                            <button onclick="switchTab('create')" class="bg-nexusHover hover:bg-gray-700 text-white font-semibold px-6 py-2.5 rounded-xl text-sm transition-all border border-gray-700">Créer un jeu</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Grille de Jeux Recommandés -->
+                <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-xl font-bold text-white flex items-center gap-2"><i class="fa-solid fa-fire text-orange-500"></i> Jeux Populaires</h2>
+                        <button class="text-sm text-nexusGreen hover:underline font-semibold">Voir tout</button>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                        <!-- Carte Jeu 1 -->
+                        <div onclick="openGamePage('Blox Battle Royale')" class="bg-nexusCard rounded-2xl overflow-hidden border border-gray-800 hover:border-nexusGreen/50 transition-all cursor-pointer group shadow-lg">
+                            <div class="h-40 bg-gray-700 relative overflow-hidden">
+                                <img src="https://images.unsplash.com/photo-1538481199705-c710c4e965fc?q=80&w=500&auto=format&fit=crop" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" alt="Jeu">
+                                <span class="absolute bottom-2 right-2 bg-black/70 backdrop-blur-md text-white text-xs px-2 py-1 rounded-md font-semibold"><i class="fa-solid fa-user text-[10px] text-nexusGreen mr-1"></i> 14.2K</span>
+                            </div>
+                            <div class="p-4 space-y-1">
+                                <h3 class="font-bold text-white text-base truncate group-hover:text-nexusGreen transition-colors">Blox Battle Royale 3D</h3>
+                                <p class="text-xs text-gray-400">Par NexusStudios</p>
+                                <div class="flex items-center justify-between pt-2 text-xs text-gray-400">
+                                    <span class="flex items-center gap-1"><i class="fa-solid fa-star text-yellow-500"></i> 94%</span>
+                                    <span>FPS / Action</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Carte Jeu 2 -->
+                        <div onclick="openGamePage('Neon City Tycoon')" class="bg-nexusCard rounded-2xl overflow-hidden border border-gray-800 hover:border-nexusGreen/50 transition-all cursor-pointer group shadow-lg">
+                            <div class="h-40 bg-gray-700 relative overflow-hidden">
+                                <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=500&auto=format&fit=crop" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" alt="Jeu">
+                                <span class="absolute bottom-2 right-2 bg-black/70 backdrop-blur-md text-white text-xs px-2 py-1 rounded-md font-semibold"><i class="fa-solid fa-user text-[10px] text-nexusGreen mr-1"></i> 8.5K</span>
+                            </div>
+                            <div class="p-4 space-y-1">
+                                <h3 class="font-bold text-white text-base truncate group-hover:text-nexusGreen transition-colors">Neon City Tycoon</h3>
+                                <p class="text-xs text-gray-400">Par CyberBuilder</p>
+                                <div class="flex items-center justify-between pt-2 text-xs text-gray-400">
+                                    <span class="flex items-center gap-1"><i class="fa-solid fa-star text-yellow-500"></i> 91%</span>
+                                    <span>Simulation</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Carte Jeu 3 -->
+                        <div onclick="openGamePage('Speed Run Ultimate')" class="bg-nexusCard rounded-2xl overflow-hidden border border-gray-800 hover:border-nexusGreen/50 transition-all cursor-pointer group shadow-lg">
+                            <div class="h-40 bg-gray-700 relative overflow-hidden">
+                                <img src="https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=500&auto=format&fit=crop" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" alt="Jeu">
+                                <span class="absolute bottom-2 right-2 bg-black/70 backdrop-blur-md text-white text-xs px-2 py-1 rounded-md font-semibold"><i class="fa-solid fa-user text-[10px] text-nexusGreen mr-1"></i> 5.1K</span>
+                            </div>
+                            <div class="p-4 space-y-1">
+                                <h3 class="font-bold text-white text-base truncate group-hover:text-nexusGreen transition-colors">Speed Run Ultimate</h3>
+                                <p class="text-xs text-gray-400">Par LeapGames</p>
+                                <div class="flex items-center justify-between pt-2 text-xs text-gray-400">
+                                    <span class="flex items-center gap-1"><i class="fa-solid fa-star text-yellow-500"></i> 88%</span>
+                                    <span>Platformer</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Carte Jeu 4 -->
+                        <div onclick="openGamePage('Zombie Outpost Survival')" class="bg-nexusCard rounded-2xl overflow-hidden border border-gray-800 hover:border-nexusGreen/50 transition-all cursor-pointer group shadow-lg">
+                            <div class="h-40 bg-gray-700 relative overflow-hidden">
+                                <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=500&auto=format&fit=crop" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" alt="Jeu">
+                                <span class="absolute bottom-2 right-2 bg-black/70 backdrop-blur-md text-white text-xs px-2 py-1 rounded-md font-semibold"><i class="fa-solid fa-user text-[10px] text-nexusGreen mr-1"></i> 3.9K</span>
+                            </div>
+                            <div class="p-4 space-y-1">
+                                <h3 class="font-bold text-white text-base truncate group-hover:text-nexusGreen transition-colors">Zombie Outpost Survival</h3>
+                                <p class="text-xs text-gray-400">Par UndeadStudio</p>
+                                <div class="flex items-center justify-between pt-2 text-xs text-gray-400">
+                                    <span class="flex items-center gap-1"><i class="fa-solid fa-star text-yellow-500"></i> 96%</span>
+                                    <span>Survie</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VUE 2 : DÉCOUVRIR (DISCOVER) -->
+            <div id="tab-content-discover" class="tab-content hidden space-y-6">
+                <h1 class="text-2xl font-bold text-white">Découvrir les mondes Nexus</h1>
+                <p class="text-gray-400 text-sm">Filtre les jeux par catégories et trouve ton prochain défi.</p>
+                <div class="flex gap-3 flex-wrap">
+                    <button class="bg-nexusGreen text-white px-4 py-2 rounded-xl text-sm font-semibold">Tous</button>
+                    <button class="bg-nexusCard border border-gray-800 text-gray-300 hover:text-white px-4 py-2 rounded-xl text-sm font-semibold">FPS & Tir</button>
+                    <button class="bg-nexusCard border border-gray-800 text-gray-300 hover:text-white px-4 py-2 rounded-xl text-sm font-semibold">Tycoon</button>
+                    <button class="bg-nexusCard border border-gray-800 text-gray-300 hover:text-white px-4 py-2 rounded-xl text-sm font-semibold">Sandbox</button>
+                    <button class="bg-nexusCard border border-gray-800 text-gray-300 hover:text-white px-4 py-2 rounded-xl text-sm font-semibold">RPG</button>
+                </div>
+            </div>
+
+            <!-- VUE 3 : AVATAR -->
+            <div id="tab-content-avatar" class="tab-content hidden space-y-6">
+                <h1 class="text-2xl font-bold text-white">Éditeur d'Avatar 3D</h1>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="md:col-span-2 bg-nexusCard border border-gray-800 rounded-2xl h-96 flex items-center justify-center text-gray-500 relative">
+                        <!-- Simulation du Viewport 3D Avatar -->
+                        <div class="text-center space-y-2">
+                            <i class="fa-solid fa-cube text-5xl text-gray-600 animate-bounce"></i>
+                            <p class="text-sm">Viewport 3D de l'Avatar en temps réel</p>
+                        </div>
+                    </div>
+                    <div class="bg-nexusCard border border-gray-800 rounded-2xl p-6 space-y-4">
+                        <h3 class="font-bold text-white">Personnalisation</h3>
+                        <div class="space-y-2">
+                            <button class="w-full text-left bg-nexusHover px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-700 transition-colors">Vêtements & Calques</button>
+                            <button class="w-full text-left bg-nexusHover px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-700 transition-colors">Accessoires</button>
+                            <button class="w-full text-left bg-nexusHover px-4 py-2.5 rounded-xl text-sm font-medium hover:bg-gray-700 transition-colors">Morphologie du corps</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VUE 4 : CRÉER (STUDIO) -->
+            <div id="tab-content-create" class="tab-content hidden space-y-6">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h1 class="text-2xl font-bold text-white">Espace Créateur</h1>
+                        <p class="text-gray-400 text-sm">Gère tes créations et lance Nexus Studio.</p>
+                    </div>
+                    <button class="bg-nexusGreen hover:bg-nexusGreenHover text-white font-bold px-5 py-2.5 rounded-xl text-sm shadow-lg shadow-nexusGreen/20 transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-plus"></i> Nouveau Projet
+                    </button>
+                </div>
+                <div class="bg-nexusCard border border-gray-800 rounded-2xl p-8 flex items-center justify-between">
+                    <div class="space-y-2">
+                        <h3 class="text-lg font-bold text-white">Mon Premier Jeu Nexus</h3>
+                        <p class="text-sm text-gray-400">Dernière modification : Il y a 2 heures • Serveur Privé</p>
+                    </div>
+                    <button onclick="alert('Lancement de Nexus Studio...')" class="bg-nexusHover hover:bg-gray-700 text-white font-semibold px-6 py-2.5 rounded-xl text-sm border border-gray-700 transition-all flex items-center gap-2">
+                        <i class="fa-solid fa-play text-nexusGreen"></i> Ouvrir dans Studio
+                    </button>
+                </div>
+            </div>
+
+            <!-- VUE 5 : BOUTIQUE -->
+            <div id="tab-content-shop" class="tab-content hidden space-y-6">
+                <h1 class="text-2xl font-bold text-white">Boutique Nexus</h1>
+                <p class="text-gray-400 text-sm">Achète des passes de jeu, des vêtements exclusifs et des effets.</p>
+            </div>
+
+            <!-- VUE 6 : AMIS -->
+            <div id="tab-content-friends" class="tab-content hidden space-y-6">
+                <h1 class="text-2xl font-bold text-white">Amis & Messages</h1>
+                <p class="text-gray-400 text-sm">Retrouve tes amis connectés sur Project Nexus.</p>
+            </div>
+
+            <!-- VUE 7 : PAGE DE DÉTAIL D'UN JEU (CACHÉE PAR DÉFAUT) -->
+            <div id="tab-content-gamepage" class="tab-content hidden space-y-6">
+                <button onclick="switchTab('home')" class="text-sm text-gray-400 hover:text-white flex items-center gap-2 transition-colors">
+                    <i class="fa-solid fa-arrow-left"></i> Retour à l'accueil
+                </button>
+                
+                <div class="bg-nexusCard border border-gray-800 rounded-2xl p-6 space-y-6">
+                    <div class="flex flex-col md:flex-row gap-6 items-start">
+                        <div class="w-full md:w-96 h-56 bg-gray-700 rounded-xl overflow-hidden shadow-lg">
+                            <img id="game-banner-img" src="https://images.unsplash.com/photo-1538481199705-c710c4e965fc?q=80&w=500&auto=format&fit=crop" class="w-full h-full object-cover" alt="Banner">
+                        </div>
+                        <div class="flex-1 space-y-4">
+                            <div>
+                                <h1 id="game-title" class="text-3xl font-extrabold text-white">Nom du Jeu</h1>
+                                <p class="text-sm text-gray-400">Créé par <span class="text-nexusGreen font-semibold">NexusStudios</span></p>
+                            </div>
+                            <div class="flex items-center gap-4 text-sm text-gray-300">
+                                <span class="flex items-center gap-1.5"><i class="fa-solid fa-user text-nexusGreen"></i> <strong class="text-white">12.4K</strong> Actifs</span>
+                                <span class="flex items-center gap-1.5"><i class="fa-solid fa-star text-yellow-500"></i> <strong class="text-white">94%</strong> (45k votes)</span>
+                            </div>
+                            <!-- GROS BOUTON PLAY VERT -->
+                            <div class="pt-2">
+                                <button onclick="launchGameSession()" class="bg-nexusGreen hover:bg-nexusGreenHover text-white font-extrabold text-lg px-10 py-4 rounded-2xl shadow-xl shadow-nexusGreen/30 transition-all flex items-center gap-3 transform hover:scale-105 active:scale-95">
+                                    <i class="fa-solid fa-play text-xl"></i> JOUER MAINTENANT
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Description du jeu -->
+                    <div class="border-t border-gray-800 pt-6 space-y-3">
+                        <h3 class="font-bold text-white text-lg">Description</h3>
+                        <p class="text-sm text-gray-300 leading-relaxed">Bienvenue dans cette expérience incroyable sur Project Nexus ! Affronte tes amis, débloque des équipements uniques, construis ton empire et domine le classement mondial. Mises à jour chaque semaine !</p>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- JAVASCRIPT INTERACTIF -->
+    <script>
+        function switchTab(tabId) {
+            // Masquer tous les contenus
+            const contents = document.querySelectorAll('.tab-content');
+            contents.forEach(el => el.classList.add('hidden'));
+
+            // Afficher le contenu ciblé
+            const target = document.getElementById('tab-content-' + tabId);
+            if (target) {
+                target.classList.remove('hidden');
+            }
+
+            // Mettre à jour l'état actif des boutons de la barre latérale
+            const navButtons = document.querySelectorAll('.nav-btn');
+            navButtons.forEach(btn => {
+                btn.classList.remove('bg-nexusGreen', 'text-white', 'shadow-md', 'shadow-nexusGreen/20');
+                btn.classList.add('text-gray-400', 'hover:text-white', 'hover:bg-nexusHover');
+            });
+
+            const activeBtn = document.getElementById('nav-' + tabId);
+            if (activeBtn) {
+                activeBtn.classList.remove('text-gray-400', 'hover:text-white', 'hover:bg-nexusHover');
+                activeBtn.classList.add('bg-nexusGreen', 'text-white', 'shadow-md', 'shadow-nexusGreen/20');
+            }
+        }
+
+        function openGamePage(gameName) {
+            document.getElementById('game-title').innerText = gameName;
+            switchTab('gamepage');
+        }
+
+        function launchGameSession() {
+            alert("Lancement du client de jeu Project Nexus... Connexion au serveur multijoueur sécurisé en cours 🚀");
+        }
+    </script>
+</body>
+</html>
