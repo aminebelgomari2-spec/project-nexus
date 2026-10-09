@@ -23,12 +23,12 @@
             background-color: #c0c0c0;
             color: #000000;
             border: 2px solid #ffffff;
-            padding: 6px;
+            padding: 5px;
             margin: 4px auto;
             width: 200px;
             font-weight: bold;
             text-decoration: none;
-            font-size: 11px;
+            font-size: 10px;
         }
         .ds-menu-btn:active { background-color: #ffffff; }
 
@@ -94,6 +94,25 @@
             text-align: center;
             padding: 2px;
         }
+
+        /* Style pour le Clicker */
+        .clicker-box {
+            background-color: #442200;
+            border: 2px solid #ffcc00;
+            color: #ffcc00;
+            width: 120px;
+            height: 45px;
+            margin: 8px auto;
+            font-size: 12px;
+            font-weight: bold;
+            line-height: 45px;
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+        }
+        .clicker-box:active {
+            background-color: #663300;
+        }
     </style>
 </head>
 <body>
@@ -106,8 +125,9 @@
         <a class="ds-menu-btn" href="javascript:changerVue('vue-snake'); demarrerSnake();">🐍 Snake Turbo</a>
         <a class="ds-menu-btn" href="javascript:changerVue('vue-morpion'); initialiserMorpion();">❌ Morpion (Tic-Tac-Toe)</a>
         <a class="ds-menu-btn" href="javascript:changerVue('vue-plusmoins'); initialiserPlusMoins();">🔢 Plus ou Moins</a>
+        <a class="ds-menu-btn" href="javascript:changerVue('vue-clicker'); initialiserClicker();">⛏️ Casseur de Blocs (Clicker)</a>
         
-        <div style="margin-top: 10px; font-size: 9px; color: #888;">
+        <div style="margin-top: 8px; font-size: 9px; color: #888;">
             Navigateur DS - Opera Engine
         </div>
     </div>
@@ -186,6 +206,26 @@
 
         <div style="margin-top: 15px;">
             <a class="ds-btn" href="javascript:changerVue('vue-menu')" style="background:#550000; color:#ff9999;">RETOUR MENU</a>
+        </div>
+    </div>
+
+
+    <!-- ================= VUE 5 : CLICKER ================= -->
+    <div id="vue-clicker" class="vue">
+        <h1>CASSEUR DE BLOCS</h1>
+        <div style="font-size: 10px; color: #ffff00;">Or : <span id="orScore">0</span></div>
+        
+        <a class="clicker-box" href="javascript:cliquerBloc()">CASSER !</a>
+
+        <div style="font-size: 9px; margin-bottom: 4px;">
+            Pioches auto : <span id="nbPioches">0</span> (Prix: <span id="prixPioche">15</span>)
+        </div>
+        <div>
+            <a class="ds-btn" href="javascript:acheterPioche()">Acheter Pioche (+1/s)</a>
+        </div>
+
+        <div style="margin-top: 15px;">
+            <a class="ds-btn" href="javascript:changerVue('vue-menu'); arreterClicker();" style="background:#550000; color:#ff9999;">RETOUR MENU</a>
         </div>
     </div>
 
@@ -407,9 +447,53 @@
             document.getElementById("pmStatut").innerHTML = prop + " : C'est MOINS !";
             document.getElementById("pmStatut").style.color = "#ff9900";
         } else {
-            document.getElementById("pmStatut").innerHTML = "BRAVO ! Trouve en " + nbEssais + " essais !";
+            document.getElementById("pmStatut").innerHTML = "BRAVO ! Trouvé en " + nbEssais + " essais !";
             document.getElementById("pmStatut").style.color = "#00ffff";
         }
+    }
+
+    // --- MOTEUR CLICKER ---
+    var or = 0;
+    var pioches = 0;
+    var prixPioche = 15;
+    var clickerTimer = null;
+
+    function initialiserClicker() {
+        or = 0;
+        pioches = 0;
+        prixPioche = 15;
+        mettreAJourClicker();
+        if(clickerTimer) clearInterval(clickerTimer);
+        clickerTimer = setInterval(function() {
+            if(pioches > 0) {
+                or += pioches;
+                mettreAJourClicker();
+            }
+        }, 1000);
+    }
+
+    function arreterClicker() {
+        if(clickerTimer) clearInterval(clickerTimer);
+    }
+
+    function cliquerBloc() {
+        or += 1;
+        mettreAJourClicker();
+    }
+
+    function acheterPioche() {
+        if(or >= prixPioche) {
+            or -= prixPioche;
+            pioches += 1;
+            prixPioche = Math.floor(prixPioche * 1.5);
+            mettreAJourClicker();
+        }
+    }
+
+    function mettreAJourClicker() {
+        document.getElementById("orScore").innerHTML = or;
+        document.getElementById("nbPioches").innerHTML = pioches;
+        document.getElementById("prixPioche").innerHTML = prixPioche;
     }
 </script>
 
