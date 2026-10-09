@@ -23,8 +23,8 @@
             background-color: #c0c0c0;
             color: #000000;
             border: 2px solid #ffffff;
-            padding: 8px;
-            margin: 6px auto;
+            padding: 6px;
+            margin: 4px auto;
             width: 200px;
             font-weight: bold;
             text-decoration: none;
@@ -61,12 +61,12 @@
 
         /* Style pour le Morpion */
         .morpion-grille {
-            margin: 10px auto;
+            margin: 6px auto;
             border-collapse: collapse;
         }
         .morpion-grille td {
-            width: 35px;
-            height: 35px;
+            width: 33px;
+            height: 33px;
             border: 2px solid #ffffff;
             text-align: center;
             vertical-align: middle;
@@ -77,10 +77,22 @@
             height: 100%;
             background-color: #000060;
             color: #ffffff;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: bold;
             text-decoration: none;
-            line-height: 33px;
+            line-height: 31px;
+        }
+
+        /* Style pour le Plus ou Moins */
+        .input-box {
+            background-color: #000000;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            font-family: monospace;
+            font-size: 14px;
+            width: 60px;
+            text-align: center;
+            padding: 2px;
         }
     </style>
 </head>
@@ -89,12 +101,13 @@
     <!-- ================= VUE 1 : MENU PRINCIPAL ================= -->
     <div id="vue-menu" class="vue actif">
         <h1>DS PORTAL MENU</h1>
-        <p style="font-size:10px; color:#ccc;">Choisis un jeu au stylet :</p>
+        <p style="font-size:9px; color:#ccc; margin:2px 0;">Choisis un jeu au stylet :</p>
         
         <a class="ds-menu-btn" href="javascript:changerVue('vue-snake'); demarrerSnake();">🐍 Snake Turbo</a>
         <a class="ds-menu-btn" href="javascript:changerVue('vue-morpion'); initialiserMorpion();">❌ Morpion (Tic-Tac-Toe)</a>
+        <a class="ds-menu-btn" href="javascript:changerVue('vue-plusmoins'); initialiserPlusMoins();">🔢 Plus ou Moins</a>
         
-        <div style="margin-top: 15px; font-size: 9px; color: #888;">
+        <div style="margin-top: 10px; font-size: 9px; color: #888;">
             Navigateur DS - Opera Engine
         </div>
     </div>
@@ -143,9 +156,36 @@
             </tr>
         </table>
 
-        <div style="margin-top: 6px;">
+        <div style="margin-top: 4px;">
             <a class="ds-btn" href="javascript:initialiserMorpion()">Recommencer</a><br>
-            <a class="ds-btn" href="javascript:changerVue('vue-menu')" style="background:#550000; color:#ff9999; margin-top:4px;">RETOUR MENU</a>
+            <a class="ds-btn" href="javascript:changerVue('vue-menu')" style="background:#550000; color:#ff9999; margin-top:2px;">RETOUR MENU</a>
+        </div>
+    </div>
+
+
+    <!-- ================= VUE 4 : PLUS OU MOINS ================= -->
+    <div id="vue-plusmoins" class="vue">
+        <h1>PLUS OU MOINS</h1>
+        <div id="pmStatut" style="font-size: 10px; color: #00ff00; margin: 4px;">Devine un nombre entre 1 et 50</div>
+        
+        <div style="margin: 6px 0;">
+            <a class="ds-btn" href="javascript:modifierProposition(-5)">-5</a>
+            <a class="ds-btn" href="javascript:modifierProposition(-1)">-1</a>
+            <input type="text" id="propositionInput" class="input-box" value="25">
+            <a class="ds-btn" href="javascript:modifierProposition(1)">+1</a>
+            <a class="ds-btn" href="javascript:modifierProposition(5)">+5</a>
+        </div>
+
+        <div>
+            <a class="ds-btn" href="javascript:validerProposition()" style="background:#004400; padding: 5px 15px;">VALIDER</a>
+        </div>
+
+        <div style="font-size: 10px; color: #ccc; margin-top: 6px;">
+            Essais : <span id="pmEssais">0</span>
+        </div>
+
+        <div style="margin-top: 15px;">
+            <a class="ds-btn" href="javascript:changerVue('vue-menu')" style="background:#550000; color:#ff9999;">RETOUR MENU</a>
         </div>
     </div>
 
@@ -253,7 +293,7 @@
 
     // --- MOTEUR MORPION ---
     var plateau = ["", "", "", "", "", "", "", "", ""];
-    var tourJoueur = true; // true = X (joueur), false = O (ordi)
+    var tourJoueur = true;
     var jeuMorpionActif = true;
 
     function initialiserMorpion() {
@@ -285,20 +325,16 @@
 
         tourJoueur = false;
         document.getElementById("morpionStatut").innerHTML = "L'ordinateur réfléchit...";
-        setTimeout(tourOrdi, 500);
+        setTimeout(tourOrdi, 400);
     }
 
     function tourOrdi() {
         if(!jeuMorpionActif) return;
-
-        // Trouver les cases vides
         var vides = [];
         for(var i=0; i<9; i++) {
             if(plateau[i] === "") vides.push(i);
         }
-
         if(vides.length > 0) {
-            // Choix aléatoire simple pour l'ordi
             var choix = vides[Math.floor(Math.random() * vides.length)];
             plateau[choix] = "O";
             document.getElementById("c" + choix).innerHTML = "O";
@@ -314,22 +350,15 @@
                 return;
             }
         }
-
         tourJoueur = true;
         document.getElementById("morpionStatut").innerHTML = "À toi de jouer (X)";
     }
 
     function verifierVictoire(symbole) {
-        var combi = [
-            [0,1,2], [3,4,5], [6,7,8], // Lignes
-            [0,3,6], [1,4,7], [2,5,8], // Colonnes
-            [0,4,8], [2,4,6]           // Diagonales
-        ];
+        var combi = [[0,1,2], [3,4,5], [6,7,8], [0,3,6], [1,4,7], [2,5,8], [0,4,8], [2,4,6]];
         for(var i=0; i<combi.length; i++) {
             var c = combi[i];
-            if(plateau[c[0]] === symbole && plateau[c[1]] === symbole && plateau[c[2]] === symbole) {
-                return true;
-            }
+            if(plateau[c[0]] === symbole && plateau[c[1]] === symbole && plateau[c[2]] === symbole) return true;
         }
         return false;
     }
@@ -339,6 +368,48 @@
             if(plateau[i] === "") return false;
         }
         return true;
+    }
+
+    // --- MOTEUR PLUS OU MOINS ---
+    var nombreSecret = 0;
+    var nbEssais = 0;
+
+    function initialiserPlusMoins() {
+        nombreSecret = Math.floor(Math.random() * 50) + 1;
+        nbEssais = 0;
+        document.getElementById("pmEssais").innerHTML = nbEssais;
+        document.getElementById("propositionInput").value = 25;
+        document.getElementById("pmStatut").innerHTML = "Devine un nombre entre 1 et 50";
+        document.getElementById("pmStatut").style.color = "#00ff00";
+    }
+
+    function modifierProposition(val) {
+        var input = document.getElementById("propositionInput");
+        var actuel = parseInt(input.value) || 0;
+        actuel += val;
+        if(actuel < 1) actuel = 1;
+        if(actuel > 50) actuel = 50;
+        input.value = actuel;
+    }
+
+    function validerProposition() {
+        var input = document.getElementById("propositionInput");
+        var prop = parseInt(input.value);
+        if(isNaN(prop)) return;
+
+        nbEssais++;
+        document.getElementById("pmEssais").innerHTML = nbEssais;
+
+        if(prop < nombreSecret) {
+            document.getElementById("pmStatut").innerHTML = prop + " : C'est PLUS !";
+            document.getElementById("pmStatut").style.color = "#ffff00";
+        } else if(prop > nombreSecret) {
+            document.getElementById("pmStatut").innerHTML = prop + " : C'est MOINS !";
+            document.getElementById("pmStatut").style.color = "#ff9900";
+        } else {
+            document.getElementById("pmStatut").innerHTML = "BRAVO ! Trouve en " + nbEssais + " essais !";
+            document.getElementById("pmStatut").style.color = "#00ffff";
+        }
     }
 </script>
 
